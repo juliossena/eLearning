@@ -6,10 +6,12 @@ senha usuário criado: 123mudar
 
 Código Banco de Dados:
 
+
+
 create database site;
 
-
 create table Users (
+	Id int not null AUTO_INCREMENT,
 	Email varchar(100) not null,
     Name varchar(100) not null,
     Password varchar(128) not null,
@@ -17,8 +19,10 @@ create table Users (
     City varchar(100),
     Country varchar(100),
     Type int not null,
+    Unique (Id),
     primary key (Email)
 ) ENGINE=innodb; 
+
 
 
 create table Class (
@@ -169,7 +173,7 @@ create table NewsCourses (
     foreign key (EmailUser) references Users(Email)
 ) engine = innodb;
 
-DROP TRIGGER InsertFiles;
+
 
 delimiter |
 CREATE TRIGGER InsertFiles AFTER INSERT ON Files
@@ -191,7 +195,7 @@ END;
 
 delimiter ;
 
-drop trigger InsertForuns;
+
 delimiter |
 CREATE TRIGGER InsertForuns AFTER INSERT ON Forum
 FOR EACH ROW
@@ -214,6 +218,51 @@ END;
 
 delimiter ;
 
+INSERT INTO `permission` (`Id`, `Name`, `Description`, `IsMenu`, `Menu`, `Link`) VALUES
+(1, 'Instructores', 'Menú de creación de instructores', 1, 'Instructores', 'instructors'),
+(2, 'Estudiante', NULL, 1, 'Estudiante', 'students'),
+(3, 'Administradores', NULL, 1, 'Admins', 'administrators'),
+(4, 'New Administrator', NULL, 0, NULL, NULL),
+(5, 'Create New Administrator', NULL, 0, NULL, NULL),
+(6, 'Edit Administrator', NULL, 0, NULL, NULL),
+(7, 'View Administrator', NULL, 0, NULL, NULL),
+(8, 'Delete Administrator', NULL, 0, NULL, NULL),
+(9, 'View Edit Administrator', NULL, 0, NULL, NULL),
+(10, 'New Student', NULL, 0, NULL, NULL),
+(11, 'Create Student', NULL, 0, NULL, NULL),
+(12, 'Edit Student', NULL, 0, NULL, NULL),
+(13, 'view Student', NULL, 0, NULL, NULL),
+(14, 'Delete Student', NULL, 0, NULL, NULL),
+(15, 'View Edit Student', NULL, 0, NULL, NULL),
+(16, 'New Instructor', NULL, 0, NULL, NULL),
+(17, 'Create New Instructor', NULL, 0, NULL, NULL),
+(18, 'Edit Instructor', NULL, 0, NULL, NULL),
+(19, 'View Instructor', NULL, 0, NULL, NULL),
+(20, 'Delete Instructor', NULL, 0, NULL, NULL),
+(21, 'View Edit Instructor', NULL, 0, NULL, NULL),
+(22, 'Courses', NULL, 1, 'Cursos', 'courses'),
+(23, 'Classes', NULL, 1, 'Clases', 'classes'),
+(24, 'New Class', NULL, 0, NULL, NULL),
+(25, 'Create New Class', NULL, 0, NULL, NULL),
+(26, 'Edit Class', NULL, 0, NULL, NULL),
+(27, 'View Class', NULL, 0, NULL, NULL),
+(28, 'Delete Class', NULL, 0, NULL, NULL),
+(29, 'Edit Class', NULL, 0, NULL, NULL),
+(30, 'New Course', NULL, 0, NULL, NULL),
+(31, 'Create New Course', NULL, 0, NULL, NULL),
+(32, 'Edit Course', NULL, 0, NULL, NULL),
+(33, 'View Course', NULL, 0, NULL, NULL),
+(34, 'Delete Course', NULL, 0, NULL, NULL),
+(35, 'View Edit Course', NULL, 0, NULL, NULL),
+(36, 'Menu Estudiante', NULL, 1, 'Cursos', 'coursesStudents'),
+(37, 'Cursos', 'Cursos Instrutor', 1, 'Cursos', 'coursesInstructor'),
+(38, 'Open Course Instructor', NULL, 0, NULL, NULL),
+(39, 'View News Course', NULL, 0, NULL, NULL),
+(40, 'View Files Course', NULL, 0, NULL, NULL),
+(41, 'View Foruns Course', NULL, 0, NULL, NULL),
+(42, 'View Tasks Course', NULL, 0, NULL, NULL),
+(43, 'View Classes Instructor', NULL, 0, NULL, NULL),
+(44, 'View Live Classes Instructor', NULL, 0, NULL, NULL),
+(45, 'Download File Instructor', NULL, 0, NULL, NULL);
 INSERT INTO Users (Email, Name, Password, DateBirth, City, Country, Type) VALUES ('administrator', 'Administrator', '93f4a4e86cf842f2a03cd2eedbcd3c72325d6833fa991b895be40204be651427652c78b9cdbdef7c01f80a0acb58f791c36d49fbaa5738970e83772cea18eba1', '2018-01-01', 'Belo Horizonte', 'Brasil', '1');
 INSERT INTO UsersPermission (IdPermission, EmailUsers) VALUES ('1', 'administrator'), ('2', 'administrator'), ('3', 'administrator'), ('4', 'administrator'), ('5', 'administrator'), ('6', 'administrator'), ('7', 'administrator'), ('8', 'administrator'), ('9', 'administrator'), ('10', 'administrator'), ('11', 'administrator'), ('12', 'administrator'), ('13', 'administrator'), ('14', 'administrator'), ('15', 'administrator'), ('16', 'administrator'), ('17', 'administrator'), ('18', 'administrator'), ('19', 'administrator'), ('20', 'administrator'), ('21', 'administrator'), ('22', 'administrator'), ('23', 'administrator'), ('24', 'administrator'), ('25', 'administrator'), ('26', 'administrator'), ('27', 'administrator'), ('28', 'administrator'), ('29', 'administrator'), ('30', 'administrator'), ('31', 'administrator'), ('32', 'administrator'), ('33', 'administrator'), ('34', 'administrator'), ('35', 'administrator');
-
