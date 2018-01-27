@@ -1,0 +1,9 @@
+<br />
+<b>Fatal error</b>:  Uncaught Error: Class 'NewsCourse' not found in C:\xampp\htdocs\site\app\dao\CoursesDAO.php:372
+Stack trace:
+#0 C:\xampp\htdocs\site\app\controller\view\CTelaCourseInstructor.php(103): CoursesDAO-&gt;getObjects(Object(FilterCourses))
+#1 C:\xampp\htdocs\site\app\controller\view\CTelaCourseInstructor.php(18): CTelaCourseInstructor-&gt;setRoute('downloadFileCou...')
+#2 C:\xampp\htdocs\site\app\controller\ControlIndex.php(77): CTelaCourseInstructor-&gt;getScreen()
+#3 C:\xampp\htdocs\site\web\index.php(22): ControlIndex-&gt;defineRota()
+#4 {main}
+  thrown in <b>C:\xampp\htdocs\site\app\dao\CoursesDAO.php</b> on line <b>372</b><br />

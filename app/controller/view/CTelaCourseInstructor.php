@@ -38,7 +38,7 @@ class CTelaCourseInstructor extends CTela{
             
             $filter = new FilterCourses($course);
             
-            $this->screen->setViewAllCoursesInstructor($courseDAO->getObjects($filter));
+            $this->screen->setViewAllCoursesInstructor($courseDAO->getCourses($filter));
         }
         return $this->screen;
     }
@@ -75,7 +75,7 @@ class CTelaCourseInstructor extends CTela{
                     $filter = new FilterCourses($course);
                     $filter->setOrder("ORDER BY TimeChange DESC");
                     
-                    $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                    $course = $courseDAO->getNews($filter)->offsetGet(0);
                     
                     if ($course instanceof Courses) {
                         $this->screen->setNewsCourse($course->getNews());
@@ -138,7 +138,7 @@ class CTelaCourseInstructor extends CTela{
                     $courseDAO = new CoursesDAO();
                     $filter = new FilterCourses($course);
                     $filter->setOrder("ORDER BY A.DateCreate DESC");
-                    $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                    $course = $courseDAO->getForuns($filter)->offsetGet(0);
                     
                     if ($course instanceof Courses) {
                         $this->screen->setViewForuns($course);
@@ -209,7 +209,7 @@ class CTelaCourseInstructor extends CTela{
                 $filter = new FilterCourses($course);
                 $filter->setOrder("ORDER BY A.DateCreate ASC");
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getForuns($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
                     $this->screen->setViewForum($course->getForuns()->offsetGet(0));
@@ -272,6 +272,91 @@ class CTelaCourseInstructor extends CTela{
                             $this->screen->setInsertFail();
                         }
                     }
+                }
+                break;
+            case Rotas::$VIEW_ALL_EXERCISES:
+                $idCourse = $_REQUEST['idCourse'];
+                $course = new Courses();
+                $course->setId($_REQUEST['idCourse']);
+                
+                $filterCourse = new FilterCourses($course);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewAllExercises($course->getExercises(), $course);
+                }
+                
+                break;
+            case Rotas::$VIEW_CREATE_EXERCISES:
+                $idCourse = $_REQUEST['idCourse'];
+                $course = new Courses();
+                $course->setId($_REQUEST['idCourse']);
+                
+                $filterCourse = new FilterCourses($course);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewCreateExercises($course);
+                }
+                break;
+            case Rotas::$CREATE_NEW_EXERCISES:
+                $idCourse = $_REQUEST['idCourse'];
+                $nameExercise = $_REQUEST['nameExercise'];
+                $weightExercise = $_REQUEST['weightExercise'];
+                $dateLimit = $_REQUEST['dateLimit'];
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = new Courses();
+                $course->setId($idCourse);
+                
+                $exercises = new ArrayObject();
+                
+                $exercise = new Exercises();
+                $exercise->setDateLimit(DateTime::createFromFormat("d/m/Y H:i:s", $dateLimit));
+                $exercise->setIdTask($courseDAO->getNextAutoIncrementTasks());
+                $exercise->setName($nameExercise);
+                $exercise->setReleased(0);
+                $exercise->setWeightTask($weightExercise);
+                
+                $exercises->append($exercise);
+                
+                $course->setExercises($exercises);
+                
+                if ($courseDAO->insertExercisesDAO($course)) {
+                    $this->screen->setInsertSuccess();
+                } else {
+                    $this->screen->setInsertFail();
+                }
+                
+                break;
+            case Rotas::$OPEN_EXERCISE_INSTRUCTOR:
+                $idCourse = $_REQUEST['idCourse'];
+                $idExercise = $_REQUEST['idExercise'];
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $courses = new Courses();
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $courses->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filterCourse = new FilterCourses($courses);
+                
+                $course = $courseDAO->getObjects($filterCourse);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewOpenExercises($course);
                 }
                 break;
             default:

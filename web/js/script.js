@@ -479,5 +479,36 @@ $(function(){
 		});
 		
 		
+		
+		$("form#createExercise").submit(function(){
+			$idCourse = $('input[name=idCourse]').val();
+			$nameExercise = $('input[name=nameExercise]').val();
+			$weightExercise = $('input[name=weightExercise]').val();
+			$dateLimit = $('input[name=dateLimit]').val();
+			if ($nameExercise == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=nameExercise]').focus();
+			} else if ($weightExercise == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=weightExercise]').focus();
+			} else if ($dateLimit == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=dateLimit]').focus();
+			} else  {
+				$.ajax({
+					type: 'POST',
+					url: $('input[name=rota]').val(),
+					data: {
+						"idCourse": $idCourse,
+						"nameExercise": $nameExercise,
+						"weightExercise": $weightExercise,
+						"dateLimit": $dateLimit
+					}
+				}).done(function(e){
+					$("#result").html(e);
+				});
+			}
+			return false;
+		});
 	
 });

@@ -126,6 +126,10 @@ class Rotas {
 	public static $ANSWER_FORUM = "answerForum";
 	public static $VIEW_CREATE_FORUM = "viewCreateForum";
 	public static $CREATE_NEW_FORUM = 'createNewForum';
+	public static $VIEW_ALL_EXERCISES = "viewAllExercises";
+	public static $VIEW_CREATE_EXERCISES = "viewCreateExercises";
+	public static $CREATE_NEW_EXERCISES = "createNewExercises";
+	public static $OPEN_EXERCISE_INSTRUCTOR = "openExerciseInstructor";
 	
 	//SubRotas Cursos Instrutor
 	public static $COD_OPEN_COURSE = 38;

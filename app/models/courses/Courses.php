@@ -18,6 +18,7 @@ class Courses {
     private $studentsRegistered;
     private $classes;
     private $news;
+    private $exercises;
     
     public function getId() {
              return $this->id;
@@ -153,6 +154,14 @@ class Courses {
     
     public function setNews(ArrayObject $news) {
              $this->news = $news;
+    }
+    
+    public function getExercises() {
+        return $this->exercises;
+    }
+    
+    public function setExercises(ArrayObject $exercises) {
+        $this->exercises = $exercises;
     }
     
     

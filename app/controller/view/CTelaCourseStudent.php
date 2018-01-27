@@ -45,7 +45,7 @@ class CTelaCourseStudent extends CTela{
             
             $courseDAO = new CoursesDAO();
             
-            $this->screen->setViewAllCoursesStudent($courseDAO->getObjects($filterCourse), $courseDAO->getObjects($filterCourseRegistered));
+            $this->screen->setViewAllCoursesStudent($courseDAO->getCourses($filterCourse), $courseDAO->getCourses($filterCourseRegistered));
         }
        
         return $this->screen;
@@ -172,13 +172,12 @@ class CTelaCourseStudent extends CTela{
                 
                 $courseDAO = new CoursesDAO();
                 $filter = new FilterCourses($course);
+                $filter->setOrder("ORDER BY TimeChange DESC");
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getNews($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
-                    if ($this->permissionOpenCourse($this->user, $course)) {
-                        $this->screen->setNewsCourse($course->getNews());
-                    }
+                    $this->screen->setNewsCourse($course->getNews());
                 }
                 
                 break;
@@ -194,12 +193,10 @@ class CTelaCourseStudent extends CTela{
                 $filter = new FilterCourses($course);
                 $filter->setOrder("ORDER BY FI.Name");
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getFiles($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
-                    if ($this->permissionOpenCourse($this->user, $course)) {
-                        $this->screen->setViewFiles($course->getFiles(), $course);
-                    }
+                    $this->screen->setViewFiles($course->getFiles(), $course);
                 }
                 break;
                 
@@ -239,7 +236,7 @@ class CTelaCourseStudent extends CTela{
                 $courseDAO = new CoursesDAO();
                 $filter = new FilterCourses($course);
                 $filter->setOrder("ORDER BY A.DateCreate DESC");
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getForuns($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
                     $this->screen->setViewForunsStudents($course);
@@ -329,7 +326,7 @@ class CTelaCourseStudent extends CTela{
                 $filter = new FilterCourses($course);
                 $filter->setOrder("ORDER BY A.DateCreate ASC");
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getForuns($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
                     $forum = $course->getForuns()->offsetGet(0);
@@ -354,7 +351,7 @@ class CTelaCourseStudent extends CTela{
                             $filter = new FilterCourses($course);
                             $filter->setOrder("ORDER BY A.DateCreate DESC");
                             
-                            $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                            $course = $courseDAO->getForuns($filter)->offsetGet(0);
                             
                             if ($course instanceof Courses) {
                                 $forum = $course->getForuns()->offsetGet(0);

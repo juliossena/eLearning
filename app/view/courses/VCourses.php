@@ -39,6 +39,78 @@ class VCourses implements View {
         $this->content = "Error al insertar";
     }
     
+    public function setViewOpenExercises (Courses $course) {
+        $return = '';
+        
+        
+        $this->content = $return;
+    }
+    
+    public function setViewCreateExercises (Courses $course) {
+        $return = '';
+        
+        $return .= '<script type="text/javascript" src="js/script.js"></script>
+                    <div id="result"></div>
+                    <form id="createExercise">
+                        <input type="hidden" value="index.php?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$CREATE_NEW_EXERCISES.'" name="rota">
+                        <input type="hidden" value="'.$course->getId().'" name="idCourse">
+                        <table class="form">
+                            <tr>
+                                <td class="left">Título Ejercicio*
+                                <td class="right"><input name="nameExercise">
+                            <tr>
+                                <td class="left">Peso Ejercicio*
+                                <td class="right"><input name="weightExercise">
+                            <tr>
+                                <td class="left">Fecha Limite*
+                                <td class="right"><input name="dateLimit">
+                            <tr>
+                                <td colspan="2"><button type="submit">Create</button>
+                        </table>
+                    </form>';
+        
+        $this->content = $return;
+    }
+    
+    public function setViewAllExercises (ArrayObject $exercises, Courses $course) {
+        $return = '';
+        $return .= '
+        <button onclick="carregarPaginaAtivarCheck('."'#dadosNovaPagina', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CREATE_EXERCISES."&idCourse=".$course->getId()."'".')">Crear Nuevo Ejercicio</button>
+        <script type="text/javascript" src="js/jquery.quick.search.js"></script>
+        <input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Curso" />
+            <table class="lista-clientes" width="100%">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Fecha Data</th>
+                        <th colspan="3" class="actions"></th>
+                    </tr>
+                </thead>
+        ';
+        
+        for ($i = 0 ; $i < $exercises->count() ; $i++) {
+            $exercise = $exercises->offsetGet($i);
+            if ($exercise instanceof Exercises) {
+                $return .= '
+                    <tr id="tr_'.$exercise->getIdExercise().'">
+                        <td align="center">'.$exercise->getName().'</td>
+                        <td align="center">'.$exercise->getDateLimit()->format("d/m/Y").'</td>
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idCourse=".$exercise->getIdExercise()."')".'" src="imagens/editar.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idCourse=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
+                        <td><img class="imgButton" onclick="carregarPagina('."'#informacoes', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_COURSE."&idCourse=".$exercise->getIdExercise()."'".')" src="imagens/enter.png">
+                    </tr>
+                ';
+            }
+        }
+        
+        
+        $return .= '</tbody>
+            </table>';
+        
+        
+        $this->content = $return;
+    }
+    
     public function viewClassesSelect (Classes $class, ArrayObject $classesSelect) {
         for ($i = 0 ; $i < $classesSelect->count() ; $i++) {
             $newClass = $classesSelect->offsetGet($i);
@@ -270,14 +342,7 @@ class VCourses implements View {
         $return = '';
         $return .= '
             <script type="text/javascript" src="js/pageTable.js"></script>
-            <select id="limitLines">
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="200">200</option>
-                <option value="500">500</option>
-            </select>
+            <input type="hidden" id="limitLines" value="10">
             <table id="pageTable" class="tableNews">
                 <thead>
                     <tr class="nameTable">
@@ -547,7 +612,7 @@ class VCourses implements View {
         $return .= '
             <div class="reloj" id="Horas">'.$user->getTimeElapseCourse()->format("H").'</div>
     		<div class="reloj" id="Minutos">:'.$user->getTimeElapseCourse()->format("i").'</div>
-    		<div class="reloj" id="Segundos">:'.$user->getTimeElapseCourse()->format("s").'</div>
+    		<div  style="display:none;" class="reloj" id="Segundos">:'.$user->getTimeElapseCourse()->format("s").'</div>
     		<div style="display:none;" class="reloj" id="Centesimas">:00</div>
     
         ';
@@ -626,7 +691,9 @@ class VCourses implements View {
     public function setViewForum (Forum $forum) {
         $return = '';
         $return .= '<script type="text/javascript" src="js/script.js"></script>
-                        <table class="forum">
+                <script type="text/javascript" src="js/pageTable.js"></script>
+                <input type="hidden" id="limitLines" value="10">
+                <table id="pageTable" class="forum">
                 ';
         for ($i = 0 ; $i < $forum->getAnswers()->count() ; $i++) {
             $answer = $forum->getAnswers()->offsetGet($i);
@@ -648,7 +715,7 @@ class VCourses implements View {
         $return .='<tr>
                       <td>
                            <div id=result></div>
-                             </table>
+                             </table><div id="pagination"></div>
                 <form id="answerForum">
                     <input value="'.$forum->getId().'" type="hidden" name="idForum">
                     <input value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$ANSWER_FORUM.'"  type="hidden" name="rota">
@@ -664,7 +731,9 @@ class VCourses implements View {
     public function setViewForumStudents (Forum $forum) {
         $return = '';
         $return .= '<script type="text/javascript" src="js/script.js"></script>
-                        <table class="forum">
+                <script type="text/javascript" src="js/pageTable.js"></script>
+                <input type="hidden" id="limitLines" value="10">
+                <table id="pageTable" class="forum">
                 ';
         for ($i = 0 ; $i < $forum->getAnswers()->count() ; $i++) {
             $answer = $forum->getAnswers()->offsetGet($i);
@@ -686,7 +755,7 @@ class VCourses implements View {
         $return .='<tr>
                       <td>
                            <div id=result></div>
-                             </table>
+                             </table><div id="pagination"></div>
                 <form id="answerForum">
                     <input value="'.$forum->getId().'" type="hidden" name="idForum">
                     <input value="?site='.Rotas::$COURSES_STUDENTS.'&subSite='.Rotas::$ANSWER_FORUM.'"  type="hidden" name="rota">
@@ -702,7 +771,10 @@ class VCourses implements View {
     public function setViewForunsStudents (Courses $course) {
         $return = '';
         $return .= '<button onclick="carregarPaginaAtivarCheck('."'#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_CREATE_FORUM."&idCourse=".$course->getId()."'".')">Crear Nuevo Forum</button>';
-        $return .= '<table class="forum">
+        $return .= '
+                <script type="text/javascript" src="js/pageTable.js"></script>
+                <input type="hidden" id="limitLines" value="10">
+                <table id="pageTable" class="forum">
                         ';
         for ($i = 0 ; $i < $course->getForuns()->count() ; $i++) {
             $forum = $course->getForuns()->offsetGet($i);
@@ -731,14 +803,17 @@ class VCourses implements View {
             }
         }
         
-        $return .= '</table>';
+        $return .= '</table></table><div id="pagination"></div>';
         $this->content = $return;
     }
     
     public function setViewForuns (Courses $course) {
         $return = '';
         $return .= '<button onclick="carregarPaginaAtivarCheck('."'#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CREATE_FORUM."&idCourse=".$course->getId()."'".')">Crear Nuevo Forum</button>';
-        $return .= '<table class="forum">
+        $return .= '
+                <script type="text/javascript" src="js/pageTable.js"></script>
+                <input type="hidden" id="limitLines" value="10">
+                <table id="pageTable" class="forum">
                         ';
         for ($i = 0 ; $i < $course->getForuns()->count() ; $i++) {
             $forum = $course->getForuns()->offsetGet($i);
@@ -767,7 +842,7 @@ class VCourses implements View {
             }
         }
         
-        $return .= '</table>';
+        $return .= '</table></table><div id="pagination"></div>';
         $this->content = $return;
     }
     
@@ -775,30 +850,30 @@ class VCourses implements View {
         $return = '';
         $return .= '<script type="text/javascript" src="js/script.js"></script>
             
-<div class="content">
-    <div class="tabs-content">
-        <div class="tabs-menu clearfix">
-            <ul>
-                <li><a class="active-tab-menu" href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".')">Novedades</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FILES_COURSE."&idCourse=".$course->getId()."'".')">Archivos</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_TASKS_COURSE."&idCourse=".$course->getId()."'".')">Rareas</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases en Vivo</a></li>
-            </ul>
-        </div>
-                    
-        <div id="dataTab">
-            <script>
-                clearInterval(control);
-                carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".');
-                startCronometro ('."'".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('H')."', '".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('i')."', '".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('s')."'".');
-                $idCourse = '.$course->getId().';control = setInterval(cronometro,10);
-            </script>
-        </div>
-                    
-    </div>
-</div>';
+            <div class="content">
+                <div class="tabs-content">
+                    <div class="tabs-menu clearfix">
+                        <ul>
+                            <li><a class="active-tab-menu" href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".')">Novedades</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FILES_COURSE."&idCourse=".$course->getId()."'".')">Archivos</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_ALL_EXERCISES."&idCourse=".$course->getId()."'".')">Rareas</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases en Vivo</a></li>
+                        </ul>
+                    </div>
+                                
+                    <div id="dataTab">
+                        <script>
+                            clearInterval(control);
+                            carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".');
+                            startCronometro ('."'".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('H')."', '".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('i')."', '".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('s')."'".');
+                            $idCourse = '.$course->getId().';control = setInterval(cronometro,10);
+                        </script>
+                    </div>
+                                
+                </div>
+            </div>';
         
         $this->content = $return;
     }

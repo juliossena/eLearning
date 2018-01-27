@@ -50,6 +50,7 @@ function hideAllRows() {
 
 //Função para criar os botões de paginação
 function createPagination() {
+	
 	var countPages = Math.ceil(countLines / limitLines);
 	var $html = "";
 	if (countPages > 1) {
