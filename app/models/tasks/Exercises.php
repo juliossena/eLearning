@@ -1,6 +1,14 @@
 <?php
 
-require_once '../app/models/tasks/Tasks.php';
+
+$requiresEX[] = 'app/models/tasks/Tasks.php';
+
+for ($i = 0 ; $i < count($requiresEX) ; $i ++) {
+    while (!file_exists($requiresEX[$i])) {
+        $requiresEX[$i] = '../' . $requiresEX[$i];
+    }
+    require_once $requiresEX[$i];
+}
 
 class Exercises extends Tasks{
     private $idExercise;

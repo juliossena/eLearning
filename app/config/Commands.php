@@ -444,7 +444,8 @@ class Commands {
 	
 	//Download de arquivo
 	public static function downloadArquivo($localArquivo, $nomeArquivo, $type) {
-	    $path = 'C:/xampp/htdocs/eLearning/eLearning/' . $localArquivo . $nomeArquivo.'';
+	    
+	    $path = 'C:/xampp/htdocs/eLearning Git/' . $localArquivo . $nomeArquivo.'';
 		$fp = fopen($path, 'r');
 		$buffer = fread($fp, filesize($path));
 		fclose($fp);

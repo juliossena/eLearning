@@ -1,6 +1,13 @@
 <?php
 
-require_once '../app/models/tasks/CompositionQuestion.php';
+$requiresQU[] = 'app/models/tasks/CompositionQuestion.php';
+
+for ($i = 0 ; $i < count($requiresQU) ; $i ++) {
+    while (!file_exists($requiresQU[$i])) {
+        $requiresQU[$i] = '../' . $requiresQU[$i];
+    }
+    require_once $requiresQU[$i];
+}
 
 class Question {
     private $id;

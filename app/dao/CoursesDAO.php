@@ -700,6 +700,7 @@ class CoursesDAO extends DAO{
     }
     
     public function getObjects($filter) {
+        
         $objects = new ArrayObject();
         if ($filter instanceof FilterCourses) {
             $rs = $this->select($filter->getWhere(), $filter->getOrder());

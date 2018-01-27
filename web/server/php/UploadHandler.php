@@ -9,17 +9,18 @@
  * Licensed under the MIT license:
  * http://www.opensource.org/licenses/MIT
  */
-$requiresUH[] = 'app/models/courses/Courses.php';
-$requiresUH[] = 'app/models/courses/Files.php';
-$requiresUH[] = 'app/dao/CoursesDAO.php';
-$requiresUH[] = 'app/dao/DAO.php';
-$requiresUH[] = '../app/dao/Connection.php';
 
-for ($i = 0 ; $i < count($requiresUH) ; $i ++) {
-    while (!file_exists($requiresUH[$i])) {
-        $requiresUH[$i] = '../' . $requiresUH[$i];
+$requiresUH2[] = 'app/models/courses/Courses.php';
+$requiresUH2[] = 'app/models/courses/Files.php';
+$requiresUH2[] = 'app/dao/DAO.php';
+$requiresUH2[] = 'app/dao/Connection.php';
+$requiresUH2[] = 'app/dao/CoursesDAO.php';
+
+for ($i = 0 ; $i < count($requiresUH2) ; $i ++) {
+    while (!file_exists($requiresUH2[$i])) {
+        $requiresUH2[$i] = '../' . $requiresUH2[$i];
     }
-    require_once $requiresUH[$i];
+    require_once $requiresUH2[$i];
 }
 
 
