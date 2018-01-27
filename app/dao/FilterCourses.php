@@ -34,10 +34,17 @@ class FilterCourses extends FilterSearch {
             $this->courses->getStudents() != null || 
             $this->courses->getStudentsRegistered() != null ||
             $this->courses->getInstructor() != null ||
-            $this->courses->getForuns() != null) {
+            $this->courses->getForuns() != null ||
+            $this->courses->getExercises() != null) {
             
-                
-            if ($this->courses->getForuns() != null && $this->courses->getForuns()->count() > 0) {
+            if ($this->courses->getExercises() != null && $this->courses->getExercises()->count() > 0) {
+                $exercise = $this->courses->getExercises()->offsetGet(0);
+                if ($exercise instanceof Exercises) {
+                    $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                        "EX.Id LIKE '%s'",
+                        $exercise->getIdExercise());
+                }
+            }else if ($this->courses->getForuns() != null && $this->courses->getForuns()->count() > 0) {
                 $forum = $this->courses->getForuns()->offsetGet(0);
                 if ($forum instanceof Forum) {
                     $pesquisa = $this->getCampo($pesquisa) . sprintf(

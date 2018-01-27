@@ -337,7 +337,6 @@ class CTelaCourseInstructor extends CTela{
                 
                 break;
             case Rotas::$OPEN_EXERCISE_INSTRUCTOR:
-                $idCourse = $_REQUEST['idCourse'];
                 $idExercise = $_REQUEST['idExercise'];
                 
                 $exercise = new Exercises();
@@ -353,7 +352,7 @@ class CTelaCourseInstructor extends CTela{
                 $courseDAO = new CoursesDAO();
                 $filterCourse = new FilterCourses($courses);
                 
-                $course = $courseDAO->getObjects($filterCourse);
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
                     $this->screen->setViewOpenExercises($course);

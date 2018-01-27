@@ -41,6 +41,29 @@ class VCourses implements View {
     
     public function setViewOpenExercises (Courses $course) {
         $return = '';
+        $exercise = $course->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            if ($exercise->getQuestions()->count() == 0) {
+                $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
+                <div id="bodyLateral" class="bodyLateralMenuSelected">
+        			<div id="body_1">
+                        Pregunta 1
+                    </div>
+                    <div style="display: none;" id="body_2">
+                        Pregunta 2
+                    </div>
+        		</div>
+        		<div class="lateralMenu">
+        			<ul id="ulLateralMenu">
+        				<li id="1" class="selected" onclick="insertNewQuestion(1)">Pregunta 1</li>
+        				<li id="2" onclick="insertNewQuestion(2)">+ Nueva Pregunta</li>
+        			</ul>
+        		</div>';
+            } else {
+                
+            }
+        }
+        
         
         
         $this->content = $return;
@@ -95,9 +118,9 @@ class VCourses implements View {
                     <tr id="tr_'.$exercise->getIdExercise().'">
                         <td align="center">'.$exercise->getName().'</td>
                         <td align="center">'.$exercise->getDateLimit()->format("d/m/Y").'</td>
-                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idCourse=".$exercise->getIdExercise()."')".'" src="imagens/editar.png">
-                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idCourse=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
-                        <td><img class="imgButton" onclick="carregarPagina('."'#informacoes', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_COURSE."&idCourse=".$exercise->getIdExercise()."'".')" src="imagens/enter.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/editar.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
+                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_EXERCISE_INSTRUCTOR."&idExercise=".$exercise->getIdExercise()."'".')" src="imagens/enter.png">
                     </tr>
                 ';
             }

@@ -1422,3 +1422,84 @@ button.pageCurrent {
 }
 
 /*Término configuração paginação tabela*/
+
+
+/*Inicio configuração menu questões*/
+div.bodyLateral {
+	position: absolute;
+}
+
+div.lateralMenu{
+	margin-top: 20px;
+	text-align: center;
+	margin-left: -94%;
+	position: absolute;
+	display: inline-block;
+}
+
+div.lateralMenu ul{
+	list-style: none;
+}
+
+div.lateralMenu li{
+	transition: 0.5s;
+	cursor: pointer;
+	margin-top: -9px;
+	font-family: 'verdana';
+	font-size: 9pt;
+	width: 140px;
+	color: white;
+	padding: 10px;
+	background-color: #0074a2;
+	border: 2px solid white;
+	z-index: 1;
+}
+
+div.lateralMenu li.selected{
+	transition: 0.5s;
+	cursor: pointer;
+	margin-top: -9px;
+	font-family: 'verdana';
+	font-size: 9pt;
+	width: 140px;
+	color: #0074a2;
+	padding: 10px;
+	background-color: white;
+	border: 2px solid #004e6a;
+	border-right: 0px;
+	position: relative;
+	z-index: 2;	
+}
+
+div.lateralMenu li:HOVER{
+	background-color: #004e6a;
+	width: 170px;
+	position: relative;
+	z-index: 3;
+	color: yellow;
+}
+
+div.bodyLateralMenu {
+	margin-left: 10%;
+	padding: 20px;
+	padding-left: 50px;
+	width: 85%;
+	height: 1000px;
+	display: none;
+	position: relative;
+	background-color: white;
+}
+
+div.bodyLateralMenuSelected {
+	text-align: center;
+	margin-left: 10%;
+	padding: 20px;
+	padding-left: 50px;
+	width: 85%;
+	height: 1000px;
+	display: inline-block;
+	position: relative;
+	background-color: white;
+}
+
+/*Término configuração menu questões*/
