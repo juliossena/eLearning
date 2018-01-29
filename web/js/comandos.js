@@ -15,6 +15,10 @@ var $idCourse = "";
 $emailsSelect = "";
 $classSelect = "";
 
+function insertTextArea($id) {
+	$('#' + $id).append('<textarea></textarea>');
+}
+
 function startCronometro ($hora, $minuto, $segundo) {
 	horas = $hora;
 	minutos = $minuto;

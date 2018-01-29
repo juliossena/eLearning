@@ -45,10 +45,24 @@ class VCourses implements View {
         if ($exercise instanceof Exercises) {
             if ($exercise->getQuestions()->count() == 0) {
                 $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
+                            <script type="text/javascript" src="js/script.js"></script>
                 <div id="bodyLateral" class="bodyLateralMenuSelected">
         			<div id="body_1">
-                        Pregunta 1
+                        <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio">Fácil</label>
+            			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2"><label for="label2" class="labelRadio">Médio</label>
+            			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio">Difícil</label>
+                        <div class="divQuestion"><div id="contentQuestion"></div>
+                            <form id="enviarC" enctype="multipart/form-data">
+                                <img onclick="insertTextArea('."'contentQuestion'".')" class="icon" src="imagens/textArea.png">
+                                <label for="imgQuestion"></label>
+                                <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
+                                <input name="imgQuestion" type="file" id="imgQuestion">
+                            </form>
+                            
+                            </div>
+                        <div class="divNewAlternatives">Nueva Alternativa</div>
                     </div>
+
                     <div style="display: none;" id="body_2">
                         Pregunta 2
                     </div>

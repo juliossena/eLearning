@@ -1505,3 +1505,128 @@ div.bodyLateralMenuSelected {
 
 
 /*Término configuração menu questões*/
+
+
+/*Inicio configuração Select Button*/
+
+.radioHidden {
+	display: none;
+}
+
+.labelRadio {
+	display:inline-block;
+	transition: 0.5s;
+	cursor: pointer;
+	font-family: 'verdana';
+	width: 150px;
+	padding: 10px;
+	border: 2px solid #1C4592;
+	background-color: white;
+	color: #1C4592;
+}
+
+.labelRadio:hover {
+	background-color: #1C4592;
+	color: white;
+	
+}
+
+.labelRadioSelected {
+	display:inline-block;
+	transition: 0.5s;
+	cursor: pointer;
+	font-family: 'verdana';
+	width: 150px;
+	padding: 10px;
+	border: 2px solid #1C4592;
+	background-color: #1C4592;
+	color: white;
+}
+
+/*Término configuração Select Button*/
+
+/*Início configuração das questões e alternativas*/
+div.divQuestion {
+	padding: 20px;
+	margin-top: 20px;
+	width: 100%;
+	background-color: #cecae3;
+}
+
+div.divQuestion img{
+	display: block;
+	text-align: center;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	max-width: 90%;
+}
+
+div.divQuestion textarea{
+	height: 100px;
+	margin: 10px;
+	width: 100%;
+}
+
+div.divQuestion input[type=file] {
+	display: none;
+}
+
+div.divQuestion label {
+	border: 0px;
+	transition: 0.5s;
+	cursor: pointer;
+	background: url("../imagens/iconImg.png") no-repeat center center;
+	background-size: 100%;
+	margin: 10px;
+	width: 30px;
+	height: 30px;
+	vertical-align: top;
+	display: inline-block;
+}
+
+div.divQuestion label:hover {
+	width: 50px;
+	height: 50px;
+}
+
+div.divQuestion img.icon{
+	vertical-align: top;
+	display: inline-block;
+	transition: 0.5s;
+	cursor: pointer;
+	margin: 10px;
+	width: 30px;
+	height: 30px;
+}
+
+div.divQuestion img.icon:hover{
+	width: 50px;
+	height: 50px;
+}
+
+
+
+div.divAlternatives {
+	padding: 20px;
+	margin-top: 20px;
+	width: 100%;
+	background-color: #e4c9ca;
+}
+
+div.divNewAlternatives {
+	transition: 0.5s;
+	cursor: pointer;
+	font-size: 14pt;
+	padding: 20px;
+	margin-top: 20px;
+	width: 100%;
+	color: #800000;
+	background-color: #e4c9ca;
+}
+
+div.divNewAlternatives:hover {
+	background-color: #d9b3b4;
+}
+
+/*Término configuração das questões e alternativas*/

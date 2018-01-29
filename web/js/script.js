@@ -1,5 +1,38 @@
 $(function(){
-		
+	
+	$('form#enviarC').change(function(){
+		$.ajax({
+			type: 'POST',
+			contentType: false,
+    	    cache: false,
+			processData:false,
+			url: $('input[name=rota]').val(),
+			data:  new FormData(this), 
+		}).done(function(e){
+			if (e != '') {
+				$('#contentQuestion').append('<img src="' + e + '">');
+			}
+			$('input[name=imgQuestion]').val('');
+		});
+		return false;
+	});
+	
+	$('div.divNewAlternatives').click(function(){
+			
+		if ($(this).text() == "Nueva Alternativa") {
+			$(this).text('');
+			$(this).attr('class', 'divAlternatives');
+			$("#body_1").append('<script type="text/javascript" src="js/script.js"></script><div class="divNewAlternatives">Nueva Alternativa</div>');
+		}
+	});
+	
+	//Comando Select Button
+	$('label').click(function() {
+		$('.labelRadioSelected').attr('class', 'labelRadio');
+		$(this).attr('class', 'labelRadioSelected');
+	});
+	
+	
 		$('.tabs-menu ul li a').click(function(){
 		    var a = $(this);
 		    var active_tab_class = 'active-tab-menu';

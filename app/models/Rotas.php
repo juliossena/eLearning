@@ -13,6 +13,7 @@ class Rotas {
 	public static $COURSES_STUDENTS = "coursesStudents"; //36
 	public static $COURSES_INSTRUCTOR = "coursesInstructor"; //37
 	public static $OPEN_IMG_PERFIL = "openImgPerfil";
+	public static $OPEN_IMG = "openImg";
 	
 	//Códigos Rotas primárias
 	
@@ -130,6 +131,7 @@ class Rotas {
 	public static $VIEW_CREATE_EXERCISES = "viewCreateExercises";
 	public static $CREATE_NEW_EXERCISES = "createNewExercises";
 	public static $OPEN_EXERCISE_INSTRUCTOR = "openExerciseInstructor";
+	public static $INSERT_IMAGE = "insertImage";
 	
 	//SubRotas Cursos Instrutor
 	public static $COD_OPEN_COURSE = 38;

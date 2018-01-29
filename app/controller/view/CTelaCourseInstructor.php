@@ -358,6 +358,22 @@ class CTelaCourseInstructor extends CTela{
                     $this->screen->setViewOpenExercises($course);
                 }
                 break;
+                
+            case Rotas::$INSERT_IMAGE:
+                $uploaddir = '../dados/imgs/';
+                
+                $nameFile = explode(".", $_FILES['imgQuestion']['name']);
+                $extensao = strtolower($nameFile[count($nameFile) -1]);
+                
+                if ($extensao == "jpg" || $extensao == "jpeg"  || $extensao == "png"  || $extensao == "gif" ) {
+                    $file = hash("sha512", date('l jS \of F Y h:i:s A') . $nameFile[0]) . '.' . $extensao;
+                    $uploadfile = $uploaddir . $file;
+                    if (move_uploaded_file($_FILES['imgQuestion']['tmp_name'], $uploadfile)){
+                        echo "?site=" . Rotas::$OPEN_IMG . "&nameImg=" . $file;
+                    }
+                    
+                }
+                break;
             default:
                 break;
         }

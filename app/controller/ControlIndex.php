@@ -83,6 +83,10 @@ class ControlIndex {
 			        $email = $_REQUEST['emailUser'];
 			        echo Commands::downloadArquivo('dados/perfis/', $email . '.jpg', 'image/jpeg');
 			        break;
+			    case Rotas::$OPEN_IMG:
+			        $nameImg = $_REQUEST['nameImg'];
+			        echo Commands::downloadArquivo('dados/imgs/', $nameImg, 'image/jpeg');
+			        break;
 				case Rotas::$LOGOFF:
 				    session_destroy();
 				    header("Location: index.php");
