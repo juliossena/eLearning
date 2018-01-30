@@ -46,23 +46,38 @@ class VCourses implements View {
             if ($exercise->getQuestions()->count() == 0) {
                 $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
                             <script type="text/javascript" src="js/script.js"></script>
+                <form class="formImg" id="enviarC" enctype="multipart/form-data">
+                    <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
+                    <input name="imgQuestion" type="file" id="imgQuestion">
+                </form>
+                <form class="formImg" id="enviarAlt" enctype="multipart/form-data">
+                    <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
+                    <input name="imgQuestion" type="file" id="imgAlternative">
+                </form>
                 <div id="bodyLateral" class="bodyLateralMenuSelected">
-        			<div id="body_1">
-                        <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio">Fácil</label>
-            			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2"><label for="label2" class="labelRadio">Médio</label>
-            			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio">Difícil</label>
-                        <div class="divQuestion"><div id="contentQuestion"></div>
-                            <form id="enviarC" enctype="multipart/form-data">
-                                <img onclick="insertTextArea('."'contentQuestion'".')" class="icon" src="imagens/textArea.png">
-                                <label for="imgQuestion"></label>
-                                <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
-                                <input name="imgQuestion" type="file" id="imgQuestion">
-                            </form>
+                    <form id="sendQuestion" class="formQuestion">
+            			<div id="body_1">
+                            <input type="hidden" name="idExercise" value="'.$_REQUEST['idExercise'].'">
+                            <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio">Fácil</label>
+                			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2"><label for="label2" class="labelRadio">Médio</label>
+                			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio">Difícil</label>
                             
-                            </div>
-                        <div class="divNewAlternatives">Nueva Alternativa</div>
-                    </div>
 
+                                <input name="rotaQuestion" type="hidden" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_QUESTION.'">
+                                <div class="divQuestion"><div id="contentQuestion"></div>
+                            
+                                <img onclick="insertTextArea('."'contentQuestion'".')" class="icon" src="imagens/textArea.png">
+                                <label for="imgQuestion" class="insertImg"></label>
+                                
+                                
+                                </div>
+                            <div onclick="insertNewAlternative(' . "'0'" . ', 1)" class="divNewAlternatives" id="alt_0">Nueva Alternativa</div>
+                                
+                            
+                        </div>
+                        <button style="float: right; margin: 10px;">Guardar</button>
+                    </form>
+                    
                     <div style="display: none;" id="body_2">
                         Pregunta 2
                     </div>
@@ -74,7 +89,68 @@ class VCourses implements View {
         			</ul>
         		</div>';
             } else {
-                
+                $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
+                            <script type="text/javascript" src="js/script.js"></script>
+                            <form class="formImg" id="enviarC" enctype="multipart/form-data">
+                                <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
+                                <input name="imgQuestion" type="file" id="imgQuestion">
+                            </form>
+                            <form class="formImg" id="enviarAlt" enctype="multipart/form-data">
+                                <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
+                                <input name="imgQuestion" type="file" id="imgAlternative">
+                            </form>
+                            <div id="bodyLateral" class="bodyLateralMenuSelected">';
+                for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
+                    $question = $exercise->getQuestions()->offsetGet($k);
+                    if ($question instanceof Question) {
+                        $return .= '<div id="body_'. ($k + 1) .'">';
+                        for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
+                            $compostion = $question->getCompositionQuestion()->offsetGet($i);
+                            if ($compostion instanceof CompositionQuestion) {
+                                if ($compostion->getLink() != '') {
+                                    $return .= '<p><img src="'.$compostion->getLink().'"></p>';
+                                } else {
+                                    $return .= '<p>'.$compostion->getText().'</p>';
+                                }
+                            }
+                        }
+                        $return .= '
+                            </div>';
+                    }
+                    
+                }
+                $return .= '
+                        <form id="sendQuestion" class="formQuestion">
+                            <div style="display: none;" id="body_'.($exercise->getQuestions()->count() + 1).'">
+                                
+                                    <input type="hidden" name="idExercise" value="'.$_REQUEST['idExercise'].'">
+                                    <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio">Fácil</label>
+                        			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2"><label for="label2" class="labelRadio">Médio</label>
+                        			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio">Difícil</label>
+                                    
+        
+                                        <input name="rotaQuestion" type="hidden" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_QUESTION.'">
+                                        <div class="divQuestion"><div id="contentQuestion"></div>
+                                    
+                                        <img onclick="insertTextArea('."'contentQuestion'".')" class="icon" src="imagens/textArea.png">
+                                        <label for="imgQuestion" class="insertImg"></label>
+                                        
+                                        
+                                        </div>
+                                    <div onclick="insertNewAlternative(' . "'0'" . ', '.($exercise->getQuestions()->count() + 1).')" class="divNewAlternatives" id="alt_0">Nueva Alternativa</div>
+                                    
+                                
+                            </div>
+                            <button style="float: right; margin: 10px;">Guardar</button>
+                        </form>
+                        
+            		</div>
+            		<div class="lateralMenu">
+            			<ul id="ulLateralMenu">
+            				<li id="1" class="selected" onclick="insertNewQuestion(1)">Pregunta 1</li>
+            				<li id="2" onclick="insertNewQuestion(2)">+ Nueva Pregunta</li>
+            			</ul>
+            		</div>';
             }
         }
         

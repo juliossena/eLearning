@@ -18,11 +18,14 @@ class CoursesDAO extends DAO{
     private $nextAutoIncrement = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Courses'";
     private $nextAutoIncrementForum = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Forum'";
     private $nextAutoIncrementTasks = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Tasks'";
+    private $nextAutoIncrementQuestion = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Question'";
     private $insertCourse = "INSERT INTO Courses (Id, Name, Description, DateNew, DateFinish, Information, Instructor, Password, CertifiedPercentage, MinimumTime) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
     private $insertCourseClass = "INSERT INTO CoursesAvailableClass (IdCourse, IdClass) VALUES %s";
     private $insertCourseUser = "INSERT INTO CoursesAvailableUser (IdCourse, EmailUser) VALUES %s";
     private $insertCourseFile = "INSERT INTO Files (Name, Link, Thumbnail, IdCourses) VALUES ('%s', '%s', '%s', '%s')";
     private $insertTasks = "INSERT INTO Tasks (Id, IdCourses, WeightTask) VALUES ('%s', '%s', '%s')";
+    private $insertQuestion = "INSERT INTO Question (Id, Difficulty, Sequence, IdExercises) VALUES ('%s', '%s', '%s', '%s')";
+    private $insertCompositionQuestion = "INSERT INTO CompositionQuestion (IdQuestion, Sequence, Type, Answer, Text, Link) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
     private $insertExercises = "INSERT INTO Exercises (Name, DateLimite, Released, IdTasks) VALUES ('%s', '%s', '%s', '%s')";
     private $insertCourseUserRegistered = "INSERT INTO CoursesRegisteredUser (IdCourse, EmailUser) VALUES ('%s', '%s')";
     private $insertForum = "INSERT INTO Forum (Id, UserCreate, IdCourses, DateCreate, Title) VALUES ('%s', '%s', '%s', Now(), '%s')";
@@ -129,6 +132,24 @@ class CoursesDAO extends DAO{
             throw new ObjectException("it is necessary that the object be of type course");
         }
     }
+   // private $insertCompositionQuestion = "INSERT INTO CompositionQuestion (IdQuestion, Sequence, Type, Answer, Text, Link) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
+    
+    public function insertQuestionDAO (Exercises $exercises) {
+        $question = $exercises->getQuestions()->offsetGet(0);
+        if ($question instanceof Question) {
+            $sql = sprintf($this->insertQuestion, $question->getId(), $question->getDifficulty(), $question->getSequence(), $exercises->getIdExercise());
+            if ($this->runQuery($sql)) {
+                for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
+                    $composition = $question->getCompositionQuestion()->offsetGet($i);
+                    if ($composition instanceof CompositionQuestion) {
+                        $sql = sprintf($this->insertCompositionQuestion, $question->getId(), $composition->getSequence(), $composition->getType(), $composition->getAnswer(), $composition->getText(), $composition->getLink());
+                        $this->runQuery($sql);
+                    }
+                }
+            }
+        }
+        
+    }
     
     public function insertExercisesDAO (Courses $course) {
         $exercise = $course->getExercises()->offsetGet(0);
@@ -194,6 +215,11 @@ class CoursesDAO extends DAO{
             }
         }
         return $this->multiplesInserts($object);
+    }
+    
+    public function getNextAutoIncrementQuestion() {
+        $vetor = $this->runSelect($this->nextAutoIncrementQuestion);
+        return $vetor[0]['AUTO_INCREMENT'];
     }
     
     public function getNextAutoIncrementTasks() {

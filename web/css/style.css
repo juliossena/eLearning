@@ -1513,7 +1513,7 @@ div.bodyLateralMenuSelected {
 	display: none;
 }
 
-.labelRadio {
+.bodyLateralMenuSelected .labelRadio {
 	display:inline-block;
 	transition: 0.5s;
 	cursor: pointer;
@@ -1525,13 +1525,13 @@ div.bodyLateralMenuSelected {
 	color: #1C4592;
 }
 
-.labelRadio:hover {
+.bodyLateralMenuSelected .labelRadio:hover {
 	background-color: #1C4592;
 	color: white;
 	
 }
 
-.labelRadioSelected {
+.bodyLateralMenuSelected .labelRadioSelected {
 	display:inline-block;
 	transition: 0.5s;
 	cursor: pointer;
@@ -1553,8 +1553,8 @@ div.divQuestion {
 	background-color: #cecae3;
 }
 
-div.divQuestion img{
-	display: block;
+.formQuestion img{
+	display: inline-block;
 	text-align: center;
 	margin: auto;
 	margin-top: 10px;
@@ -1562,17 +1562,23 @@ div.divQuestion img{
 	max-width: 90%;
 }
 
-div.divQuestion textarea{
+.formQuestion textarea{
 	height: 100px;
-	margin: 10px;
-	width: 100%;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 90%;
 }
 
-div.divQuestion input[type=file] {
+.formQuestion textarea.textAreaImg {
 	display: none;
 }
 
-div.divQuestion label {
+.formImg input[type=file] {
+	display: none;
+}
+
+.formQuestion label.insertImg {
 	border: 0px;
 	transition: 0.5s;
 	cursor: pointer;
@@ -1585,12 +1591,12 @@ div.divQuestion label {
 	display: inline-block;
 }
 
-div.divQuestion label:hover {
+.formQuestion label.insertImg:hover {
 	width: 50px;
 	height: 50px;
 }
 
-div.divQuestion img.icon{
+.formQuestion img.icon{
 	vertical-align: top;
 	display: inline-block;
 	transition: 0.5s;
@@ -1600,7 +1606,7 @@ div.divQuestion img.icon{
 	height: 30px;
 }
 
-div.divQuestion img.icon:hover{
+.formQuestion img.icon:hover{
 	width: 50px;
 	height: 50px;
 }
@@ -1627,6 +1633,29 @@ div.divNewAlternatives {
 
 div.divNewAlternatives:hover {
 	background-color: #d9b3b4;
+}
+
+div.buttonDelete {
+	padding: 5px;
+	color: white;
+	margin: 10px;
+	vertical-align: top;
+	display: inline-block;
+	cursor: pointer;
+	background-color: #800000;
+	width: 30px;
+	height: 30px;
+}
+
+div.deleteAlternative {
+	padding: 5px;
+	cursor: pointer;
+	color: white;
+	background-color: #800000;
+	width: 30px;
+	height: 30px;
+	float: right;
+	margin: -20px;
 }
 
 /*Término configuração das questões e alternativas*/

@@ -374,9 +374,86 @@ class CTelaCourseInstructor extends CTela{
                     
                 }
                 break;
+            case Rotas::$INSERT_QUESTION:
+                $courseDAO = new CoursesDAO();
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($_REQUEST['idExercise']);
+                
+                $questions = $_REQUEST['question'];
+                $alternative = $_REQUEST['alternative'];
+                $respTemp = $_REQUEST['resp'];
+                
+                
+                $i = 0;
+                while (!isset($resp) || count($resp) != count($respTemp)) {
+                    if (isset($respTemp[$i])) {
+                        $resp[] = $respTemp[$i];
+                    }
+                    $i++;
+                }
+                $contSeq = 1;
+                
+                $compositions = new ArrayObject();
+                for ($i = 0 ; $i < count($questions) ; $i++) {
+                    $composition = new CompositionQuestion();
+                    if ($this->identifyLink($questions[$i])) {
+                        $composition->setLink($questions[$i]);
+                        $composition->setType(2);
+                    } else {
+                        $composition->setText($questions[$i]);
+                        $composition->setType(1);
+                    }
+                    $composition->setSequence($contSeq);
+                    $contSeq++;
+                    
+                    $compositions->append($composition);
+                }
+                
+                for ($i = 0 ; $i < count($alternative) ; $i++) {
+                    $composition = new CompositionQuestion();
+                    if ($this->identifyLink($alternative[$i])) {
+                        $composition->setLink($alternative[$i]);
+                        $composition->setType(2);
+                    } else {
+                        $composition->setText($alternative[$i]);
+                        $composition->setType(1);
+                    }
+                    $composition->setAnswer($resp[$i]);
+                    $composition->setSequence($contSeq);
+                    $contSeq++;
+                    
+                    $compositions->append($composition);
+                }
+                
+                $question = new Question();
+                $question->setCompositionQuestion($compositions);
+                $question->setDifficulty($_REQUEST['levelQuestion']);
+                $question->setId($courseDAO->getNextAutoIncrementQuestion());
+                
+                $questions = new ArrayObject();
+                $questions->append($question);
+                
+                $exercise->setQuestions($questions);
+                
+                if ($courseDAO->insertQuestionDAO($exercise)) {
+                    echo 'deu bom';
+                } else {
+                    echo 'deu ruim';
+                }
+                
+                break;
             default:
                 break;
         }
+    }
+    
+    private function identifyLink($string) {
+        $vetor = explode("&", $string);
+        if ($vetor[0] == ' ?site=openImg') {
+            return true;
+        }
+        return false;
     }
     
 }

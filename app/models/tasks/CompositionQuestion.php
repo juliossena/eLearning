@@ -5,7 +5,14 @@ class CompositionQuestion {
     private $type;
     private $text;
     private $link;
+    private $answer;
     
+    /*
+    Type = 1 -> questão tipo text
+    Type = 2 -> questao tipo link
+    Type = 3 -> alternativa tipo text
+    Type = 4 -> alternativa tipo link
+    */
     public function getSequence() {
         return $this->sequence;
     }
@@ -37,5 +44,15 @@ class CompositionQuestion {
     public function setLink($link) {
         $this->link = $link;
     }
+    
+    public function getAnswer() {
+        return $this->answer;
+    }
+    
+    public function setAnswer($answer) {
+        $this->answer = $answer;
+    }
+    
+    
     
 }

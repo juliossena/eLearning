@@ -132,6 +132,7 @@ class Rotas {
 	public static $CREATE_NEW_EXERCISES = "createNewExercises";
 	public static $OPEN_EXERCISE_INSTRUCTOR = "openExerciseInstructor";
 	public static $INSERT_IMAGE = "insertImage";
+	public static $INSERT_QUESTION = "insertQuestion";
 	
 	//SubRotas Cursos Instrutor
 	public static $COD_OPEN_COURSE = 38;
