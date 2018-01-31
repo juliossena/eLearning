@@ -383,6 +383,7 @@ class CTelaCourseInstructor extends CTela{
                 $questions = $_REQUEST['question'];
                 $alternative = $_REQUEST['alternative'];
                 $respTemp = $_REQUEST['resp'];
+                $numberQuestion = $_REQUEST['numberQuestion'];
                 
                 
                 $i = 0;
@@ -430,6 +431,7 @@ class CTelaCourseInstructor extends CTela{
                 $question->setCompositionQuestion($compositions);
                 $question->setDifficulty($_REQUEST['levelQuestion']);
                 $question->setId($courseDAO->getNextAutoIncrementQuestion());
+                $question->setSequence($numberQuestion);
                 
                 $questions = new ArrayObject();
                 $questions->append($question);
@@ -437,11 +439,24 @@ class CTelaCourseInstructor extends CTela{
                 $exercise->setQuestions($questions);
                 
                 if ($courseDAO->insertQuestionDAO($exercise)) {
-                    echo 'deu bom';
-                } else {
-                    echo 'deu ruim';
+                    $course = new Courses();
+                    $exercises = new ArrayObject();
+                    $exercises->append($exercise);
+                    
+                    $course->setExercises($exercises);
+                    
+                    $filterCourse = new FilterCourses($course);
+                    
+                    $courses = $courseDAO->getObjects($filterCourse);
+                    
+                    $question = $courses->offsetGet(0)->getExercises()->offsetGet(0)->getQuestions()->offsetGet(0);
+                    
+                    $this->screen->setCompositionQuestion($question);
                 }
+                break;
                 
+            case Rotas::$SET_NEW_QUESTION:
+                $this->screen->setNewQuestion();
                 break;
             default:
                 break;

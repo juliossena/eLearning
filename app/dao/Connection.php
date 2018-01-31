@@ -12,7 +12,7 @@ class Connection {
 	}
 	
 	public function runQuery($sql){
-	    echo $sql . "<br>";
+//	    echo $sql . "<br>";
 		$stm = $this->connect()->prepare($sql);
 		return $stm->execute();
 	}

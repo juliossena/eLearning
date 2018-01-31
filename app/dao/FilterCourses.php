@@ -35,14 +35,24 @@ class FilterCourses extends FilterSearch {
             $this->courses->getStudentsRegistered() != null ||
             $this->courses->getInstructor() != null ||
             $this->courses->getForuns() != null ||
+            $this->courses->getExercises() != null ||
             $this->courses->getExercises() != null) {
             
             if ($this->courses->getExercises() != null && $this->courses->getExercises()->count() > 0) {
                 $exercise = $this->courses->getExercises()->offsetGet(0);
                 if ($exercise instanceof Exercises) {
-                    $pesquisa = $this->getCampo($pesquisa) . sprintf(
-                        "EX.Id LIKE '%s'",
-                        $exercise->getIdExercise());
+                    if ($exercise->getQuestions() != null && $exercise->getQuestions()->count() > 0) {
+                        $question = $exercise->getQuestions()->offsetGet(0);
+                        if ($question instanceof Question) {
+                            $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                                "QU.Id LIKE '%s'",
+                                $question->getId());
+                        }
+                    } else {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "EX.Id LIKE '%s'",
+                            $exercise->getIdExercise());
+                    }
                 }
             }else if ($this->courses->getForuns() != null && $this->courses->getForuns()->count() > 0) {
                 $forum = $this->courses->getForuns()->offsetGet(0);

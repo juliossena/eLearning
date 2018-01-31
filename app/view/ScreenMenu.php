@@ -17,6 +17,10 @@ abstract class ScreenMenu extends Screen {
 		$this->usuario = $usuario;
 	}
 	
+	public function getUser() {
+	    return $this->usuario;
+	}
+	
 	private function getMenu(Users $user) {
 	    
 		$return = '

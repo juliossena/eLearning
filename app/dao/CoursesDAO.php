@@ -148,7 +148,7 @@ class CoursesDAO extends DAO{
                 }
             }
         }
-        
+        return true;
     }
     
     public function insertExercisesDAO (Courses $course) {

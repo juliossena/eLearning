@@ -538,10 +538,6 @@ div#detalhes {
 	position: absolute;
 	height: 90%;
 }
-#informacoes h1{
-	font-family: 'verdana';
-	font-size: 72pt;
-}
 
 @media (max-width: 1467px) {
 	#informacoes{
@@ -663,6 +659,26 @@ div.btnMenu img{
 div.btnMenu p{
 	margin-top: 0px;
 	color: white;
+}
+
+div.menuHome {
+	transition: 0.5s;
+	width: 100%;
+	margin: 20px;
+}
+
+div.menuHome img{
+	width: 100px;
+	height: 80px;
+	transition: 0.5s;
+	cursor: pointer;
+	border-radius: 10px;
+	padding: 20px;
+	background-color: #404041;
+}
+
+div.menuHome img:hover{
+	background-color: #242424;
 }
 /*Tï¿½rmino Menu lateral*/
 
@@ -1484,7 +1500,6 @@ div.bodyLateralMenu {
 	padding: 20px;
 	padding-left: 50px;
 	width: 85%;
-	height: 1000px;
 	display: none;
 	position: relative;
 	background-color: white;
@@ -1494,14 +1509,31 @@ div.bodyLateralMenuSelected {
 	text-align: center;
 	margin-left: 10%;
 	padding: 20px;
-	padding-left: 50px;
+	padding-left: 70px;
 	width: 85%;
-	height: 1000px;
 	display: inline-block;
 	position: relative;
 	background-color: white;
 }
 
+div.bodyLateralMenuSelected img{
+	max-width: 100%;	
+}
+div.bodyLateralMenuSelected p{
+	text-align: justify;
+}
+
+div.bodyLateralMenuSelected p.pImg{
+	text-align: center;
+}
+
+div.bodyLateralMenuSelected h1{
+	font-size: 16pt;
+	text-align: left;
+	padding: 10px;
+	border-bottom: 2px solid #800000;
+	margin-bottom: 20px;
+}
 
 
 /*Término configuração menu questões*/

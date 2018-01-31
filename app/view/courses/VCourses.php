@@ -39,25 +39,27 @@ class VCourses implements View {
         $this->content = "Error al insertar";
     }
     
-    public function setViewOpenExercises (Courses $course) {
-        $return = '';
-        $exercise = $course->getExercises()->offsetGet(0);
-        if ($exercise instanceof Exercises) {
-            if ($exercise->getQuestions()->count() == 0) {
-                $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
-                            <script type="text/javascript" src="js/script.js"></script>
-                <form class="formImg" id="enviarC" enctype="multipart/form-data">
-                    <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
-                    <input name="imgQuestion" type="file" id="imgQuestion">
-                </form>
-                <form class="formImg" id="enviarAlt" enctype="multipart/form-data">
-                    <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
-                    <input name="imgQuestion" type="file" id="imgAlternative">
-                </form>
-                <div id="bodyLateral" class="bodyLateralMenuSelected">
+    public function setNewQuestion () {
+        $this->content = $this->newQuestion();
+    }
+    
+    public function newQuestion ($numberBody = 1) {
+        if (isset($_REQUEST['numberBody'])) {
+            $numberBody = $_REQUEST['numberBody'];
+        }
+        $return = '<script type="text/javascript" src="js/lateralMenu.js"></script>
+                   <script type="text/javascript" src="js/script.js"></script>
+                    <script>
+                        setNumberQuestion('. ($numberBody) .');
+                        setNumberQuestions('. ($numberBody) .');
+                        setIdSelected('. ($numberBody) .');
+                        setAceptNewQuestion (false);
+                    </script>
                     <form id="sendQuestion" class="formQuestion">
-            			<div id="body_1">
-                            <input type="hidden" name="idExercise" value="'.$_REQUEST['idExercise'].'">
+            			<div id="body_'.($numberBody).'">
+                            <input type="hidden" name="numberQuestion" value="' .$numberBody. '">
+                            <input type="hidden" name="nameBody" value="body_'.($numberBody).'">
+                            <input type="hidden" name="idExercise" value="' . $_REQUEST['idExercise'] . '">
                             <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio">Fácil</label>
                 			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2"><label for="label2" class="labelRadio">Médio</label>
                 			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio">Difícil</label>
@@ -71,21 +73,51 @@ class VCourses implements View {
                                 
                                 
                                 </div>
-                            <div onclick="insertNewAlternative(' . "'0'" . ', 1)" class="divNewAlternatives" id="alt_0">Nueva Alternativa</div>
-                                
-                            
+                            <div onclick="insertNewAlternative(' . "'0'" . ', '.($numberBody).')" class="divNewAlternatives" id="alt_0">Nueva Alternativa</div>
                         </div>
-                        <button style="float: right; margin: 10px;">Guardar</button>
-                    </form>
+                        <button type="submit" style="float: right; margin: 10px;">Guardar</button>
+                    </form>';
+        return $return;
+    }
+    
+    public function setCompositionQuestion (Question $question) {
+        $return = '';
+        $return .= '<h1>Pregunta '.$question->getSequence().'</h1>';
+        for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
+            $compostion = $question->getCompositionQuestion()->offsetGet($i);
+            if ($compostion instanceof CompositionQuestion) {
+                if ($compostion->getLink() != '') {
+                    $return .= '<p><img src="'.$compostion->getLink().'"></p>';
+                } else {
+                    $return .= '<p>'.$compostion->getText().'</p>';
+                }
+            }
+        }
+        $this->content = $return;
+    }
+    
+    public function setViewOpenExercises (Courses $course) {
+        $return = '';
+        $idExercise = $_REQUEST['idExercise'];
+        $exercise = $course->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            if ($exercise->getQuestions()->count() == 0) {
+                $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
+                            <script type="text/javascript" src="js/script.js"></script>
+                <form class="formImg" id="enviarC" enctype="multipart/form-data">
+                    <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
                     
-                    <div style="display: none;" id="body_2">
-                        Pregunta 2
-                    </div>
+                    <input name="imgQuestion" type="file" id="imgQuestion">
+                </form>
+                <form class="formImg" id="enviarAlt" enctype="multipart/form-data">
+                    <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_IMAGE.'">
+                    <input name="imgQuestion" type="file" id="imgAlternative">
+                </form>
+                <div id="bodyLateral" class="bodyLateralMenuSelected">
         		</div>
         		<div class="lateralMenu">
         			<ul id="ulLateralMenu">
-        				<li id="1" class="selected" onclick="insertNewQuestion(1)">Pregunta 1</li>
-        				<li id="2" onclick="insertNewQuestion(2)">+ Nueva Pregunta</li>
+        				<li id="1" onclick="insertNewQuestion(1, ' . $idExercise . ')">+ Nueva Pregunta</li>
         			</ul>
         		</div>';
             } else {
@@ -103,12 +135,17 @@ class VCourses implements View {
                 for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
                     $question = $exercise->getQuestions()->offsetGet($k);
                     if ($question instanceof Question) {
-                        $return .= '<div id="body_'. ($k + 1) .'">';
+                        if ($k == 0) {
+                            $return .= '<div id="body_'. ($k + 1) .'">';
+                        } else {
+                            $return .= '<div style="display: none;" id="body_'. ($k + 1) .'">';
+                        }
+                        $return .= '<h1>Pregunta '.$question->getSequence().'</h1>';
                         for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
                             $compostion = $question->getCompositionQuestion()->offsetGet($i);
                             if ($compostion instanceof CompositionQuestion) {
                                 if ($compostion->getLink() != '') {
-                                    $return .= '<p><img src="'.$compostion->getLink().'"></p>';
+                                    $return .= '<p class="pImg"><img src="'.$compostion->getLink().'"></p>';
                                 } else {
                                     $return .= '<p>'.$compostion->getText().'</p>';
                                 }
@@ -120,35 +157,24 @@ class VCourses implements View {
                     
                 }
                 $return .= '
-                        <form id="sendQuestion" class="formQuestion">
-                            <div style="display: none;" id="body_'.($exercise->getQuestions()->count() + 1).'">
-                                
-                                    <input type="hidden" name="idExercise" value="'.$_REQUEST['idExercise'].'">
-                                    <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio">Fácil</label>
-                        			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2"><label for="label2" class="labelRadio">Médio</label>
-                        			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio">Difícil</label>
-                                    
-        
-                                        <input name="rotaQuestion" type="hidden" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_QUESTION.'">
-                                        <div class="divQuestion"><div id="contentQuestion"></div>
-                                    
-                                        <img onclick="insertTextArea('."'contentQuestion'".')" class="icon" src="imagens/textArea.png">
-                                        <label for="imgQuestion" class="insertImg"></label>
-                                        
-                                        
-                                        </div>
-                                    <div onclick="insertNewAlternative(' . "'0'" . ', '.($exercise->getQuestions()->count() + 1).')" class="divNewAlternatives" id="alt_0">Nueva Alternativa</div>
-                                    
-                                
-                            </div>
-                            <button style="float: right; margin: 10px;">Guardar</button>
-                        </form>
                         
             		</div>
             		<div class="lateralMenu">
-            			<ul id="ulLateralMenu">
-            				<li id="1" class="selected" onclick="insertNewQuestion(1)">Pregunta 1</li>
-            				<li id="2" onclick="insertNewQuestion(2)">+ Nueva Pregunta</li>
+            			<ul id="ulLateralMenu">';
+                for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
+                    $question = $exercise->getQuestions()->offsetGet($k);
+                    if ($question instanceof Question) {
+                        if ($k == 0) {
+                            $return .= '<li id="'. ($k + 1) .'" class="selected" onclick="insertNewQuestion('. ($k + 1) .', ' . $idExercise . ')">Pregunta '. ($k + 1) .'</li>';
+                        } else {
+                            $return .= '<li id="'. ($k + 1) .'" onclick="insertNewQuestion('. ($k + 1) .', ' . $idExercise . ')">Pregunta '. ($k + 1) .'</li>';
+                        }
+                    }
+                }
+                $return .= '<script>
+                                setNumberQuestion('. ($exercise->getQuestions()->count() + 1) .');
+                            </script>
+            				<li id="'. ($exercise->getQuestions()->count() + 1) .'" onclick="insertNewQuestion('. ($exercise->getQuestions()->count() + 1) .', ' . $idExercise . ')">+ Nueva Pregunta</li>
             			</ul>
             		</div>';
             }

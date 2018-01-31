@@ -2,6 +2,56 @@
 var numberQuestion = 0;
 var numberAlternatives = 0;
 var numberAlt = 0;
+var idSelected = 1;
+var lastQuestion = 1;
+var aceptNewQuestion = true;
+
+
+
+function setNumberQuestion ($number) {
+	lastQuestion = $number;
+}
+
+function setIdSelected ($id) {
+	idSelected = $id;
+}
+
+function setAceptNewQuestion ($sit) {
+	aceptNewQuestion = $sit;
+}
+
+
+function insertNewQuestion($id, $idExercise) {
+	
+		$("li").attr('class', '');
+		$("#" + $id).attr('class', 'selected');
+		$("#body_" + idSelected).css('display', 'none');
+		idSelected = $id;
+		$("#body_" + $id).css('display', 'block');
+		
+		if ($("#" + $id).text() == '+ Nueva Pregunta') {
+			if (aceptNewQuestion) {
+				$.ajax({
+					type: 'POST',
+					url: '?site=coursesInstructor&subSite=setNewQuestion',
+					data:  {
+						"numberBody": lastQuestion,
+						"idExercise": $idExercise
+					} 
+				}).done(function(e){
+					$("#" + $id).text('Pregunta ' + lastQuestion);
+					$("#bodyLateral").append(e);
+					lastQuestion ++;
+					$("#ulLateralMenu").append('<li id="' + lastQuestion + '" onclick="insertNewQuestion(' + lastQuestion + ')">+ Nueva Pregunta</li>');
+					setAceptNewQuestion(false);
+				});
+			} else {
+				$valor = parseInt(idSelected) - 1;
+				alert ('salve la pregunta ' + $valor + ' antes de crear una nueva');
+			}
+		}
+		
+}
 
 function insertTextArea($id) {
 	$('#' + $id).append('<div id="div_' + numberQuestion + '"><textarea name="question[]"></textarea><div onclick="deleteDivQuestion('+ "'div_" + numberQuestion + "'" +')" class="buttonDelete">X</div></div>');
@@ -20,6 +70,10 @@ function deleteAlternative($id) {
 
 function deleteDivQuestion($id) {
 	$('#' + $id).text('');
+}
+
+function setNumberQuestions($number) {
+	numberQuestion = $number;
 }
 
 function insertNewAlternative ($id, $idBody) {
@@ -48,7 +102,8 @@ $(function(){
 			url: $('input[name=rotaQuestion]').val(),
 			data:  new FormData(this), 
 		}).done(function(e){
-			alert(e);
+			$('#' + $('input[name=nameBody]').val()).html(e);
+			setAceptNewQuestion(true);
 		});
 		return false;
 	});
