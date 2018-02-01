@@ -47,22 +47,24 @@ class VCourses implements View {
         if (isset($_REQUEST['numberBody'])) {
             $numberBody = $_REQUEST['numberBody'];
         }
-        $return = '<script type="text/javascript" src="js/lateralMenu.js"></script>
-                   <script type="text/javascript" src="js/script.js"></script>
+        $return = '<script type="text/javascript" src="js/sendQuestion.js"></script>
+                    <script type="text/javascript" src="js/lateralMenu.js"></script>
                     <script>
                         setNumberQuestion('. ($numberBody) .');
                         setNumberQuestions('. ($numberBody) .');
                         setIdSelected('. ($numberBody) .');
                         setAceptNewQuestion (false);
                     </script>
-                    <form id="sendQuestion" class="formQuestion">
+                    <form id="sendQuestion" class="formQuestion" accept-charset="ISO-8859-1">
             			<div id="body_'.($numberBody).'">
+                            <h1>Pregunta '. $numberBody .'</h1>
+                            <button type="submit" style="float: right; margin: 10px;">Guardar</button>
                             <input type="hidden" name="numberQuestion" value="' .$numberBody. '">
                             <input type="hidden" name="nameBody" value="body_'.($numberBody).'">
                             <input type="hidden" name="idExercise" value="' . $_REQUEST['idExercise'] . '">
-                            <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio">Fácil</label>
-                			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2"><label for="label2" class="labelRadio">Médio</label>
-                			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio">Difícil</label>
+                            <input class="radioHidden" type="radio" name="levelQuestion" id="label1" value="1"><label for="label1" class="labelRadio"><span class="labelRadio">Fácil</span></label>
+                			<input class="radioHidden" type="radio" name="levelQuestion" id="label2" value="2" checked><label for="label2" class="labelRadio"><span class="labelRadio">Médio</span></label>
+                			<input class="radioHidden" type="radio" name="levelQuestion" id="label3" value="3"><label for="label3" class="labelRadio"><span class="labelRadio">Difícil</span></label>
                             
 
                                 <input name="rotaQuestion" type="hidden" value="?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$INSERT_QUESTION.'">
@@ -75,7 +77,6 @@ class VCourses implements View {
                                 </div>
                             <div onclick="insertNewAlternative(' . "'0'" . ', '.($numberBody).')" class="divNewAlternatives" id="alt_0">Nueva Alternativa</div>
                         </div>
-                        <button type="submit" style="float: right; margin: 10px;">Guardar</button>
                     </form>';
         return $return;
     }
@@ -86,10 +87,26 @@ class VCourses implements View {
         for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
             $compostion = $question->getCompositionQuestion()->offsetGet($i);
             if ($compostion instanceof CompositionQuestion) {
-                if ($compostion->getLink() != '') {
-                    $return .= '<p><img src="'.$compostion->getLink().'"></p>';
+                if ($compostion->getType() == 1 || $compostion->getType() == 2) {
+                    if ($compostion->getLink() != '') {
+                        $return .= '<p class="pImg"><img src="'.$compostion->getLink().'"></p>';
+                    } else {
+                        $return .= '<p>'.$compostion->getText().'</p>';
+                    }
                 } else {
-                    $return .= '<p>'.$compostion->getText().'</p>';
+                    if ($compostion->getAnswer()) {
+                        if ($compostion->getLink() != '') {
+                            $return .= '<p class="pImgTrue"><img src="'.$compostion->getLink().'"></p>';
+                        } else {
+                            $return .= '<p class="pTrue">'.$compostion->getText().'</p>';
+                        }
+                    } else {
+                        if ($compostion->getLink() != '') {
+                            $return .= '<p class="pImgFalse"><img src="'.$compostion->getLink().'"></p>';
+                        } else {
+                            $return .= '<p class="pFalse">'.$compostion->getText().'</p>';
+                        }
+                    }
                 }
             }
         }
@@ -144,11 +161,28 @@ class VCourses implements View {
                         for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
                             $compostion = $question->getCompositionQuestion()->offsetGet($i);
                             if ($compostion instanceof CompositionQuestion) {
-                                if ($compostion->getLink() != '') {
-                                    $return .= '<p class="pImg"><img src="'.$compostion->getLink().'"></p>';
+                                if ($compostion->getType() == 1 || $compostion->getType() == 2) {
+                                    if ($compostion->getLink() != '') {
+                                        $return .= '<p class="pImg"><img src="'.$compostion->getLink().'"></p>';
+                                    } else {
+                                        $return .= '<p>'.$compostion->getText().'</p>';
+                                    }
                                 } else {
-                                    $return .= '<p>'.$compostion->getText().'</p>';
+                                    if ($compostion->getAnswer()) {
+                                        if ($compostion->getLink() != '') {
+                                            $return .= '<p class="pImgTrue"><img src="'.$compostion->getLink().'"></p>';
+                                        } else {
+                                            $return .= '<p class="pTrue">'.$compostion->getText().'</p>';
+                                        }
+                                    } else {
+                                        if ($compostion->getLink() != '') {
+                                            $return .= '<p class="pImgFalse"><img src="'.$compostion->getLink().'"></p>';
+                                        } else {
+                                            $return .= '<p class="pFalse">'.$compostion->getText().'</p>';
+                                        }
+                                    }
                                 }
+                                
                             }
                         }
                         $return .= '

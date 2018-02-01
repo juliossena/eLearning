@@ -415,10 +415,10 @@ class CTelaCourseInstructor extends CTela{
                     $composition = new CompositionQuestion();
                     if ($this->identifyLink($alternative[$i])) {
                         $composition->setLink($alternative[$i]);
-                        $composition->setType(2);
+                        $composition->setType(4);
                     } else {
                         $composition->setText($alternative[$i]);
-                        $composition->setType(1);
+                        $composition->setType(3);
                     }
                     $composition->setAnswer($resp[$i]);
                     $composition->setSequence($contSeq);

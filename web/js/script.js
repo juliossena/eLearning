@@ -1,7 +1,6 @@
 
 var numberQuestion = 0;
-var numberAlternatives = 0;
-var numberAlt = 0;
+
 var idSelected = 1;
 var lastQuestion = 1;
 var aceptNewQuestion = true;
@@ -22,7 +21,6 @@ function setAceptNewQuestion ($sit) {
 
 
 function insertNewQuestion($id, $idExercise) {
-	
 		$("li").attr('class', '');
 		$("#" + $id).attr('class', 'selected');
 		$("#body_" + idSelected).css('display', 'none');
@@ -42,7 +40,7 @@ function insertNewQuestion($id, $idExercise) {
 					$("#" + $id).text('Pregunta ' + lastQuestion);
 					$("#bodyLateral").append(e);
 					lastQuestion ++;
-					$("#ulLateralMenu").append('<li id="' + lastQuestion + '" onclick="insertNewQuestion(' + lastQuestion + ')">+ Nueva Pregunta</li>');
+					$("#ulLateralMenu").append('<li id="' + lastQuestion + '" onclick="insertNewQuestion(' + lastQuestion + ', ' + $idExercise + ')">+ Nueva Pregunta</li>');
 					setAceptNewQuestion(false);
 				});
 			} else {
@@ -54,13 +52,14 @@ function insertNewQuestion($id, $idExercise) {
 }
 
 function insertTextArea($id) {
-	$('#' + $id).append('<div id="div_' + numberQuestion + '"><textarea name="question[]"></textarea><div onclick="deleteDivQuestion('+ "'div_" + numberQuestion + "'" +')" class="buttonDelete">X</div></div>');
+	$('#' + $id).append('<div id="div_' + numberQuestion + '"><textarea name="question[]"></textarea><div onclick="deleteDivQuestion('+ "'div_" + numberQuestion + "'" +')" class="buttonDelete"></div></div>');
 	numberQuestion++;
 }
 
 function insertTextAreaAlternative($id) {
-	$('#' + $id).text('');
-	$('#' + $id).append('<div onclick="deleteAlternative(' + "'" + $id + "'" + ')" class="deleteAlternative">X</div><div id="altTextArea_' + numberAlternatives + '"><textarea name="alternative[]"></textarea><input type="radio" name="resp['+ numberAlternatives +']" value="0" checked><input type="radio" name="resp['+ numberAlternatives +']" value="1">   </div>');
+	$('#TA' + $id).css('display', 'none');
+	$('#IMG' + $id).css('display', 'none');
+	$('#' + $id).append('<div id="altTextArea_' + numberAlternatives + '"><textarea name="alternative[]"></textarea></div>');
 }
 
 function deleteAlternative($id) {
@@ -76,37 +75,9 @@ function setNumberQuestions($number) {
 	numberQuestion = $number;
 }
 
-function insertNewAlternative ($id, $idBody) {
-	if ($id == numberAlternatives) {
-		$('#alt_' + $id).text('');
-		$('#alt_' + $id).append('<div id="alt_' + numberAlternatives + '"></div><img onclick="insertTextAreaAlternative(' + "'alt_" + numberAlternatives + "'" + ')" class="icon" src="imagens/textArea.png"><label onclick="setNumberAlt('+ numberAlternatives + ')" for="imgAlternative" class="insertImg"></label>');
-		$('#alt_' + $id).attr('class', 'divAlternatives');
-		numberAlternatives ++;
-		$("#body_" + $idBody).append('<div id="alt_' + numberAlternatives + '" onclick="insertNewAlternative(' + "'" + numberAlternatives + "', " + $idBody + ')" class="divNewAlternatives">Nueva Alternativa</div>');
-	}
-	
-}
 
-function setNumberAlt($number) {
-	numberAlt = $number;
-}
 
 $(function(){
-	
-	$('form#sendQuestion').submit(function(){
-		$.ajax({
-			type: 'POST',
-			contentType: false,
-    	    cache: false,
-			processData:false,
-			url: $('input[name=rotaQuestion]').val(),
-			data:  new FormData(this), 
-		}).done(function(e){
-			$('#' + $('input[name=nameBody]').val()).html(e);
-			setAceptNewQuestion(true);
-		});
-		return false;
-	});
 	
 	$('form#enviarC').change(function(){
 		$.ajax({
@@ -118,7 +89,7 @@ $(function(){
 			data:  new FormData(this), 
 		}).done(function(e){
 			if (e != '') {
-				$('#contentQuestion').append('<div id="div_' + numberQuestion + '"><textarea class="textAreaImg" name="question[]"> ' + e + '</textarea><img src="' + e + '"><div onclick="deleteDivQuestion('+ "'div_" + numberQuestion + "'" +')" class="buttonDelete">X</div></div>');
+				$('#contentQuestion').append('<div id="div_' + numberQuestion + '"><textarea class="textAreaImg" name="question[]"> ' + e + '</textarea><img src="' + e + '"><div onclick="deleteDivQuestion('+ "'div_" + numberQuestion + "'" +')" class="buttonDelete"></div></div>');
 				numberQuestion++;
 			}
 			$('input[name=imgQuestion]').val('');
@@ -137,21 +108,15 @@ $(function(){
 			data:  new FormData(this), 
 		}).done(function(e){
 			if (e != '') {
-				$('#alt_' + numberAlt).text('');
-				$('#alt_' + numberAlt).append('<div onclick="deleteAlternative(' + "'alt_" + numberAlt + "'" + ')" class="deleteAlternative">X</div><textarea class="textAreaImg" name="alternative[]"> ' + e + '</textarea><img src="' + e + '"><input type="radio" name="resp['+ numberAlternatives +']" value="0" checked><input type="radio" name="resp['+ numberAlternatives +']" value="1">   ');
+				$('#TAalt_' + numberAlt).css('display', 'none');
+				$('#IMGalt_' + numberAlt).css('display', 'none');
+				$('#alt_' + numberAlt).append('<textarea class="textAreaImg" name="alternative[]"> ' + e + '</textarea><img src="' + e + '">');
 				numberQuestion++;
 			}
 			$('input[name=imgQuestion]').val('');
 		});
 		return false;
 	});
-	
-	//Comando Select Button
-	$('label.labelRadio').click(function() {
-		$('.labelRadioSelected').attr('class', 'labelRadio');
-		$(this).attr('class', 'labelRadioSelected');
-	});
-	
 	
 		$('.tabs-menu ul li a').click(function(){
 		    var a = $(this);

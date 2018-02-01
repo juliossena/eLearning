@@ -60,7 +60,7 @@ class CoursesDAO extends DAO{
                         T.Id as IdTasks, FI.Id as IdFile, FI.Name as NameFile, FI.Thumbnail, FI.Link as LinkFile,
                         EX.Id as IdExercises, EX.Name as NameExercises, Ex.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises,
                         QU.Id as IdQuestion, QU.Difficulty as DifficultyQuestion, QU.Sequence as SequenceQuestion, 
-                        CQ.Sequence as SequenceComposition, CQ.Type as TypeCompostion, CQ.Text as TextComposition, CQ.Link as LinkComposition,
+                        CQ.Sequence as SequenceComposition, CQ.Type as TypeCompostion, CQ.Text as TextComposition, CQ.Link as LinkComposition, CQ.Answer as AnswerQuestion,
                         NC.Id as IdNewsCourse, NC.Type as TypeNewsCourse, NC.ChangeCourse, NC.TimeChange, NC.EmailUser as EmailUserNews, 
                         NC.NameUser as NameUserNews 
                         FROM Courses as C left join CoursesAvailableClass as CAC ON C.Id = CAC.IdCourse 
@@ -142,7 +142,7 @@ class CoursesDAO extends DAO{
                 for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
                     $composition = $question->getCompositionQuestion()->offsetGet($i);
                     if ($composition instanceof CompositionQuestion) {
-                        $sql = sprintf($this->insertCompositionQuestion, $question->getId(), $composition->getSequence(), $composition->getType(), $composition->getAnswer(), $composition->getText(), $composition->getLink());
+                        $sql = sprintf($this->insertCompositionQuestion, $question->getId(), $composition->getSequence(), $composition->getType(), $composition->getAnswer(), Commands::javaScriptForISO($composition->getText()), $composition->getLink());
                         $this->runQuery($sql);
                     }
                 }
@@ -860,6 +860,7 @@ class CoursesDAO extends DAO{
                         $compositions = new ArrayObject();
                         if ($rs[$i]['SequenceComposition'] != null) {
                             $composition = new CompositionQuestion();
+                            $composition->setAnswer($rs[$i]['AnswerQuestion']);
                             $composition->setLink($rs[$i]['LinkComposition']);
                             $composition->setSequence($rs[$i]['SequenceComposition']);
                             $composition->setText($rs[$i]['TextComposition']);

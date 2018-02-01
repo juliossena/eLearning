@@ -1517,7 +1517,7 @@ div.bodyLateralMenuSelected {
 }
 
 div.bodyLateralMenuSelected img{
-	max-width: 100%;	
+	max-width: 85%;	
 }
 div.bodyLateralMenuSelected p{
 	text-align: justify;
@@ -1526,6 +1526,35 @@ div.bodyLateralMenuSelected p{
 div.bodyLateralMenuSelected p.pImg{
 	text-align: center;
 }
+
+div.bodyLateralMenuSelected p.pImgTrue{
+	padding: 10px;
+	border: 1px solid #008016;
+	text-align: center;
+}
+
+div.bodyLateralMenuSelected p.pImgFalse{
+	padding: 10px;
+	border: 1px solid #800000;
+	text-align: center;
+}
+
+div.bodyLateralMenuSelected p.pFalse{
+	padding: 10px;
+	border: 1px solid #800000;
+	background-color: #fff2f2;
+	width: 100%;
+}
+
+div.bodyLateralMenuSelected p.pTrue{
+	padding: 10px;
+	border: 1px solid #008016;
+	background-color: #e8ffec;
+	width: 100%;
+}
+
+
+
 
 div.bodyLateralMenuSelected h1{
 	font-size: 16pt;
@@ -1545,7 +1574,7 @@ div.bodyLateralMenuSelected h1{
 	display: none;
 }
 
-.bodyLateralMenuSelected .labelRadio {
+.bodyLateralMenuSelected input[type="radio"] + label span.labelRadio{
 	display:inline-block;
 	transition: 0.5s;
 	cursor: pointer;
@@ -1557,20 +1586,12 @@ div.bodyLateralMenuSelected h1{
 	color: #1C4592;
 }
 
-.bodyLateralMenuSelected .labelRadio:hover {
+.bodyLateralMenuSelected input[type="radio"] + label span.labelRadio:hover {
 	background-color: #1C4592;
 	color: white;
-	
 }
 
-.bodyLateralMenuSelected .labelRadioSelected {
-	display:inline-block;
-	transition: 0.5s;
-	cursor: pointer;
-	font-family: 'verdana';
-	width: 150px;
-	padding: 10px;
-	border: 2px solid #1C4592;
+.bodyLateralMenuSelected input[type="radio"]:checked + label span.labelRadio{
 	background-color: #1C4592;
 	color: white;
 }
@@ -1652,6 +1673,13 @@ div.divAlternatives {
 	background-color: #e4c9ca;
 }
 
+div.divAlternativesTrue {
+	padding: 20px;
+	margin-top: 20px;
+	width: 100%;
+	background-color: #c5e9ca;
+}
+
 div.divNewAlternatives {
 	transition: 0.5s;
 	cursor: pointer;
@@ -1674,15 +1702,23 @@ div.buttonDelete {
 	vertical-align: top;
 	display: inline-block;
 	cursor: pointer;
+	background: url(../imagens/delete_Icon.png) center no-repeat;
 	background-color: #800000;
 	width: 30px;
 	height: 30px;
 }
 
+div.buttonDelete:hover {
+	background: url(../imagens/delete_Icon.png) center no-repeat;
+	background-color: #400000;
+}
+
 div.deleteAlternative {
+	transition: 0.5s;
 	padding: 5px;
 	cursor: pointer;
 	color: white;
+	background: url(../imagens/delete_Icon.png) center no-repeat;
 	background-color: #800000;
 	width: 30px;
 	height: 30px;
@@ -1690,4 +1726,45 @@ div.deleteAlternative {
 	margin: -20px;
 }
 
+div.deleteAlternative:hover {
+	background: url(../imagens/delete_Icon.png) center no-repeat;
+	background-color: #400000;
+}
+
+div.radioTrue input {
+	display: none;
+}
+
+div.radioTrue label{
+	padding: 5px;
+	cursor: pointer;
+	color: white;
+	float: left;
+	margin: -25px;
+}
+
+div.radioTrue input[type="radio"] + label span{
+	display: inline-block;
+	width: 29px;
+	height: 29px;
+	background: url(../imagens/true_false.png) -30px top no-repeat;
+	vertical-align: middle;
+	cursor:pointer;
+}
+
+div.radioTrue input[type="radio"] + label span.true{
+	display: inline-block;
+	width: 29px;
+	height: 29px;
+	background: url(../imagens/true_false.png) 0px top no-repeat;
+	vertical-align: middle;
+	cursor:pointer;
+}
+
+div.radioTrue input[type="radio"]:checked + label span{
+	display: none;
+}
+
 /*Término configuração das questões e alternativas*/
+
+

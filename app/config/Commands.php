@@ -219,6 +219,70 @@ class Commands {
     }
     
     
+    public static function javaScriptForISO($string) {
+        $string = str_replace('Ã­', 'í', $string);
+        $string = str_replace('â€“', '-', $string);
+        $string = str_replace('ÃŽ', 'Î', $string); 
+        $string = str_replace('Ãž', 'Þ', $string);
+        $string = str_replace('ÃŸ', 'ß', $string);
+        $string = str_replace('Ã™', 'Ù', $string);
+        $string = str_replace('ÃŠ', 'Ê', $string);
+        $string = str_replace('Ãš', 'Ú', $string);
+        $string = str_replace('ÃŒ', 'Ì', $string);
+        $string = str_replace('Ãœ', 'Ü', $string);
+        $string = str_replace('Ãº', 'ú', $string);
+        $string = str_replace('Ãƒ', 'Ã', $string);
+        $string = str_replace('Ãª', 'ê', $string);
+        $string = str_replace('Ã³', 'ó', $string);
+        $string = str_replace('Ã²', 'ò', $string);
+        $string = str_replace('Ã¹', 'ù', $string);
+        $string = str_replace('Ã¾', 'þ', $string);
+        $string = str_replace('Ã½', 'ý', $string);
+        $string = str_replace('Ã¼', 'ü', $string);
+        $string = str_replace('Ã‰', 'É', $string);
+        $string = str_replace('Ã•', 'Õ', $string);
+        $string = str_replace('Ã‡', 'Ç', $string);
+        $string = str_replace('Ã†', 'Æ', $string);
+        $string = str_replace('Ã…', 'Å', $string);
+        $string = str_replace('Ã·', '÷', $string);
+        $string = str_replace('Ãµ', 'õ', $string);
+        $string = str_replace('Ã°', 'ð', $string);
+        $string = str_replace('Ã®', 'î', $string);
+        $string = str_replace('Ã©', 'é', $string);
+        $string = str_replace('Ã§', 'ç', $string);
+        $string = str_replace('Ã»', 'û', $string);
+        $string = str_replace('Ã«', 'ë', $string);
+        $string = str_replace('Ã±', 'ñ', $string);
+        $string = str_replace('Ã€', 'À', $string);
+        $string = str_replace('Ã¥', 'å', $string);
+        $string = str_replace('Ã¤', 'ä', $string);
+        $string = str_replace('Ã£', 'ã', $string);
+        $string = str_replace('Ã¢', 'â', $string);
+        $string = str_replace('Ã›', 'Û', $string);
+        $string = str_replace('Ã‹', 'Ë', $string);
+        $string = str_replace('Ã„', 'Ä', $string);
+        $string = str_replace('Ã”', 'Ô', $string);
+        $string = str_replace('Ã“', 'Ó', $string);
+        $string = str_replace('Ã‚', 'Â', $string);
+        $string = str_replace('Ã’', 'Ò', $string);
+        $string = str_replace('Ã‘', 'Ñ', $string);
+        $string = str_replace('Ã˜', 'Ø', $string);
+        $string = str_replace('Ã¿', 'ÿ', $string);
+        $string = str_replace('Ã¸', 'ø', $string);
+        $string = str_replace('Ã´', 'ô', $string);
+        $string = str_replace('Ã¯', 'ï', $string);
+        $string = str_replace('Ã¨', 'è', $string);
+        $string = str_replace('Ã¦', 'æ', $string);
+        $string = str_replace('Ã¡', 'á', $string);
+        $string = str_replace('Ãˆ', 'È', $string);
+        $string = str_replace('Ã—', '×', $string);
+        $string = str_replace('Ã–', 'Ö', $string);
+        $string = str_replace('Ã', 'ì', $string);
+        $string = str_replace('Ã', 'à', $string);
+        
+        return $string;
+    }
+    
 	//Converter Caracteres especiais para linguagem lida no JAVAScript 
 	public static function caracteresEspeciaisParaJAVAScript($string){
 		$string = str_replace('ï¿½', '&Agrave;', $string);
