@@ -336,6 +336,47 @@ class CTelaCourseInstructor extends CTela{
                 }
                 
                 break;
+            case Rotas::$VIEW_EDIT_EXERCISES:
+                $idExercise = $_REQUEST['idExercise'];
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $courses = new Courses();
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $courses->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filterCourse = new FilterCourses($courses);
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewEditExercises($course);
+                }
+            
+                break;
+            case Rotas::$EDIT_EXERCISES:
+                $exercise = new Exercises();
+                
+                $exercise->setDateLimit(DateTime::createFromFormat("d/m/Y H:i:s", $_REQUEST['dateLimit']));
+                $exercise->setIdExercise($_REQUEST['idExercise']);
+                $exercise->setIdTask($_REQUEST['idTask']);
+                $exercise->setName($_REQUEST['nameExercise']);
+                $exercise->setReleased($_REQUEST['released']);
+                $exercise->setWeightTask($_REQUEST['weightExercise']);
+                
+                $coursesDAO = new CoursesDAO();
+                
+                if ($coursesDAO->updateExercise($exercise)) {
+                    $this->screen->setInsertSuccess();
+                } else {
+                    $this->screen->setInsertFail();
+                }
+                break;
             case Rotas::$OPEN_EXERCISE_INSTRUCTOR:
                 $idExercise = $_REQUEST['idExercise'];
                 

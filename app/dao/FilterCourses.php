@@ -41,7 +41,11 @@ class FilterCourses extends FilterSearch {
             if ($this->courses->getExercises() != null && $this->courses->getExercises()->count() > 0) {
                 $exercise = $this->courses->getExercises()->offsetGet(0);
                 if ($exercise instanceof Exercises) {
-                    if ($exercise->getQuestions() != null && $exercise->getQuestions()->count() > 0) {
+                    if ($exercise->getReleased() != null) {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "EX.Released LIKE '%s'",
+                            $exercise->getReleased());
+                    } else if ($exercise->getQuestions() != null && $exercise->getQuestions()->count() > 0) {
                         $question = $exercise->getQuestions()->offsetGet(0);
                         if ($question instanceof Question) {
                             $pesquisa = $this->getCampo($pesquisa) . sprintf(

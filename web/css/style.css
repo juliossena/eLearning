@@ -1565,6 +1565,41 @@ div.bodyLateralMenuSelected h1{
 }
 
 
+div.bodyLateralMenuSelected div.radioTrue input {
+	display: none;
+}
+
+div.bodyLateralMenuSelected div.radioTrue label{
+	padding: 5px;
+	cursor: pointer;
+	color: white;
+	float: left;
+	margin: -25px;
+}
+
+div.bodyLateralMenuSelected div.radioTrue input[type="radio"] + label span{
+	display: inline-block;
+	width: 29px;
+	height: 29px;
+	background: url(../imagens/true_false.png) -30px top no-repeat;
+	vertical-align: middle;
+	cursor:pointer;
+}
+
+div.bodyLateralMenuSelected div.radioTrue input[type="radio"] + label span.true{
+	display: inline-block;
+	width: 29px;
+	height: 29px;
+	background: url(../imagens/true_false.png) 0px top no-repeat;
+	vertical-align: middle;
+	cursor:pointer;
+}
+
+div.bodyLateralMenuSelected div.radioTrue input[type="radio"]:checked + label span{
+	display: none;
+}
+
+
 /*Término configuração menu questões*/
 
 
@@ -1764,6 +1799,42 @@ div.radioTrue input[type="radio"] + label span.true{
 div.radioTrue input[type="radio"]:checked + label span{
 	display: none;
 }
+
+div.radioQuestion input {
+	display: none;
+}
+
+div.radioQuestion label{
+	padding: 5px;
+	cursor: pointer;
+	color: white;
+	width: 100%;
+}
+
+div.radioQuestion input[type="radio"] + label span{
+	text-align: left;
+	font-size: 9pt;
+	display:inline-block;
+	transition: 0.5s;
+	cursor: pointer;
+	font-family: 'verdana';
+	width: 100%;
+	padding: 10px;
+	border: 2px solid #1C4592;
+	background-color: white;
+	color: #1C4592;
+}
+
+div.radioQuestion input[type="radio"] + label span.true{
+	background-color: #1C4592;
+	color: white;
+}
+
+div.radioQuestion input[type="radio"]:checked + label span{
+	background-color: #1C4592;
+	color: white;
+}
+
 
 /*Término configuração das questões e alternativas*/
 

@@ -13,6 +13,7 @@ class Users {
     private $classes;
     private $courses;
     private $timeElapseCourse;
+    private $exercises;
     
     public function getId() {
              return $this->id;
@@ -123,6 +124,15 @@ class Users {
     public function setTimeElapseCourse(DateTime $timeElapseCourse) {
              $this->timeElapseCourse = $timeElapseCourse;
     }
+    
+    public function getExercises() {
+        return $this->exercises;
+    }
+    
+    public function setExercises(ArrayObject $exercises) {
+        $this->exercises = $exercises;
+    }
+    
     
     
     

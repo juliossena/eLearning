@@ -212,7 +212,7 @@ class CTelaCourseStudent extends CTela{
                 $filter = new FilterCourses($course);
                 $filter->setOrder("ORDER BY FI.Name");
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getFiles($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
                     if ($this->permissionOpenCourse($this->user, $course)) {
@@ -251,7 +251,7 @@ class CTelaCourseStudent extends CTela{
                 $courseDAO = new CoursesDAO();
                 $filter = new FilterCourses($course);
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getForuns($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
                     $this->screen->setViewNewForumStudents($course);
@@ -266,7 +266,7 @@ class CTelaCourseStudent extends CTela{
                 $courseDAO = new CoursesDAO();
                 $filter = new FilterCourses($course);
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getCourses($filter)->offsetGet(0);
                 if ($course instanceof Courses) {
                     $forum = new Forum();
                     $forum->setId($courseDAO->getNextAutoIncrementForum());
@@ -303,7 +303,7 @@ class CTelaCourseStudent extends CTela{
                 $filter = new FilterCourses($course);
                 $filter->setOrder("ORDER BY A.DateCreate ASC");
                 
-                $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                $course = $courseDAO->getForuns($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
                     $this->screen->setViewForumStudents($course->getForuns()->offsetGet(0));
@@ -365,6 +365,144 @@ class CTelaCourseStudent extends CTela{
                         }
                     }
                 }
+                break;
+            case Rotas::$VIEW_ALL_EXERCISES_STUDENTS:
+                $idCourse = $_REQUEST['idCourse'];
+                $course = new Courses();
+                $course->setId($idCourse);
+                
+                $exercise = new Exercises();
+                $exercise->setReleased(1);
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $course->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filter = new FilterCourses($course);
+                
+                $courses = $courseDAO->getObjects($filter);
+                if ($courses->count() > 0) {
+                    $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                }
+                
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewAllExercisesStudent($course->getExercises(), $course);
+                }
+                break;
+            case Rotas::$OPEN_EXERCISE_STUDENT:
+                $idExercise = $_REQUEST['idExercise'];
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $exerciseUser = new Exercises();
+                for ($i = 0 ; $i < $this->user->getExercises()->count() ; $i++) {
+                    $exerciseUser = $this->user->getExercises()->offsetGet($i);
+                    if ($exerciseUser instanceof Exercises) {
+                        if ($exerciseUser->getIdExercise() == $exercise->getIdExercise()) {
+                            break;
+                        }
+                    }
+                }
+                
+                $courses = new Courses();
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $courses->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filterCourse = new FilterCourses($courses);
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewOpenExercisesStudents($course, $exerciseUser);
+                }
+                
+                break;
+            case Rotas::$UPDATE_COMPOSITION_QUESTION:
+                $exercise = new Exercises();
+                $exercise->setIdExercise($_REQUEST['idExercise']);
+                
+                $coursesDAO = new CoursesDAO();
+                
+                $exercise = $coursesDAO->getQuestionsExercises($exercise);
+                
+                for ($i = 0 ; $i < $exercise->getQuestions()->count() ; $i++) {
+                    $question = $exercise->getQuestions()->offsetGet($i);
+                    if ($question instanceof Question) {
+                        if (isset($_REQUEST['que_' . $question->getId()])) {
+                            $userDao = new UsersDAO();
+                            
+                            $newExercise = new Exercises();
+                            $newExercise->setIdExercise($exercise->getIdExercise());
+                            
+                                $newQuestions = new ArrayObject();
+                                
+                                    $newQuestion = new Question();
+                                    $newQuestion->setId($question->getId());
+                                    
+                                    $newCompositions = new ArrayObject();
+                                    
+                                        $newComposition = new CompositionQuestion();
+                                        $newComposition->setSequence($_REQUEST['que_' . $question->getId()]);
+                                    
+                                    $newCompositions->append($newComposition);
+                                    
+                                    $newQuestion->setCompositionQuestion($newCompositions);
+                                
+                                $newQuestions->append($newQuestion);
+                            
+                            $newExercise->setQuestions($newQuestions);
+                            
+                            $userDao->InsertCompositionUser($newExercise, $this->user);
+                            
+                        }
+                    }
+                }
+                
+                
+                
+                break;
+            case Rotas::$FINISH_EXERCISES:
+                $idExercise = $_REQUEST['idExercise'];
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $exerciseUser = new Exercises();
+                for ($i = 0 ; $i < $this->user->getExercises()->count() ; $i++) {
+                    $exerciseUser = $this->user->getExercises()->offsetGet($i);
+                    if ($exerciseUser instanceof Exercises) {
+                        if ($exerciseUser->getIdExercise() == $exercise->getIdExercise()) {
+                            break;
+                        }
+                    }
+                }
+                
+                $courses = new Courses();
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $courses->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filterCourse = new FilterCourses($courses);
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewFinishExercises($course);
+                }
+                
                 break;
             default:
                 break;

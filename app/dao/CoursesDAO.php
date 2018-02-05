@@ -41,6 +41,7 @@ class CoursesDAO extends DAO{
                            left join Answer as A ON A.IdForum = F.Id
                            left join Users as UF ON F.UserCreate = UF.Email
                            left join Users as UA ON A.UserCreate = UA.Email WHERE %s %s";
+    private $selectQuestions = "SELECT * FROM Question WHERE IdExercises LIKE '%s'";
     private $selectNews = "SELECT C.Id, NC.Id as IdNewsCourse, NC.Type as TypeNewsCourse, NC.ChangeCourse, NC.TimeChange, NC.EmailUser as EmailUserNews, 
                            NC.NameUser as NameUserNews
                            FROM Courses as C
@@ -57,12 +58,12 @@ class CoursesDAO extends DAO{
                         CAU.EmailUser as EmailUserAvailable, CCU.EmailUser as EmailUserConfig, CRU.EmailUser as EmailUserRegistered, 
                         CRU.TimeElapse, F.Id as IdForum, F.UserCreate as UserCreateForum, F.DateCreate as DateCreateForum, F.Title as TitleForum, UF.Name as NameUserForum,
                         A.Id as IdAnswer, A.UserCreate as UserCreateAnswer, A.DateCreate as DateCreateAnswer, A.Answer, UA.Name as NameUserAnswer,
-                        T.Id as IdTasks, FI.Id as IdFile, FI.Name as NameFile, FI.Thumbnail, FI.Link as LinkFile,
+                        T.Id as IdTasks, T.WeightTask, FI.Id as IdFile, FI.Name as NameFile, FI.Thumbnail, FI.Link as LinkFile,
                         EX.Id as IdExercises, EX.Name as NameExercises, Ex.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises,
                         QU.Id as IdQuestion, QU.Difficulty as DifficultyQuestion, QU.Sequence as SequenceQuestion, 
                         CQ.Sequence as SequenceComposition, CQ.Type as TypeCompostion, CQ.Text as TextComposition, CQ.Link as LinkComposition, CQ.Answer as AnswerQuestion,
                         NC.Id as IdNewsCourse, NC.Type as TypeNewsCourse, NC.ChangeCourse, NC.TimeChange, NC.EmailUser as EmailUserNews, 
-                        NC.NameUser as NameUserNews 
+                        NC.NameUser as NameUserNews
                         FROM Courses as C left join CoursesAvailableClass as CAC ON C.Id = CAC.IdCourse 
                         left join CoursesAvailableUser as CAU ON C.Id = CAU.IdCourse 
                         left join CoursesConfigUser as CCU ON C.Id = CCU.IdCourse 
@@ -76,11 +77,13 @@ class CoursesDAO extends DAO{
                         left join Question as QU ON QU.IdExercises = EX.Id
                         left join CompositionQuestion as CQ ON CQ.IdQuestion = QU.Id
                         left join Files as FI ON C.Id = FI.IdCourses 
-                        left join UsersClass as UC ON UC.IdClass = CAC.IdClass 
+                        left join UsersClass as UC ON UC.IdClass = CAC.IdClass
                         left join NewsCourses as NC ON NC.IdCourse = C.Id WHERE %s %s";
     
     private $update = "UPDATE Courses SET Name='%s', Description='%s', DateNew='%s', DateFinish='%s', Information='%s', Instructor='%s', Password='%s', CertifiedPercentage='%s', MinimumTime='%s' WHERE Id LIKE '%s'";
     private $updateTimeCourse = "UPDATE CoursesRegisteredUser SET TimeElapse = '%s' WHERE IdCourse Like '%s' AND EmailUser Like '%s'";
+    private $updateExercise = "UPDATE Exercises SET Name = '%s', DateLimite = '%s', Released = '%s' WHERE Id LIKE '%s' AND IdTasks LIKE '%s'";
+    private $updateTasks = "UPDATE Tasks SET WeightTask = '%s' Where Id LIKE '%s'";
     private $dropCourses = "DELETE FROM Courses WHERE Id LIKE '%s'";
     private $dropCoursesAvailableClass = "DELETE FROM CoursesAvailableClass WHERE IdCourse LIKE '%s'";
     private $dropCoursesAvailableUser = "DELETE FROM CoursesAvailableUser WHERE IdCourse LIKE '%s'";
@@ -132,7 +135,26 @@ class CoursesDAO extends DAO{
             throw new ObjectException("it is necessary that the object be of type course");
         }
     }
-   // private $insertCompositionQuestion = "INSERT INTO CompositionQuestion (IdQuestion, Sequence, Type, Answer, Text, Link) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
+    
+    public function getQuestionsExercises (Exercises $exercise) {
+        $sql = sprintf($this->selectQuestions, $exercise->getIdExercise());
+        $rs = $this->runSelect($sql);
+        
+        $questions = new ArrayObject();
+        
+        for ($i = 0 ; $i < count($rs) ; $i ++) {
+            if (isset($rs[$i]['Id'])) {
+                $question = new Question();
+                $question->setId($rs[$i]['Id']);
+                $questions->append($question);
+            }
+        }
+        
+        $exercise->setQuestions($questions);
+        
+        return $exercise;
+        
+    }
     
     public function insertQuestionDAO (Exercises $exercises) {
         $question = $exercises->getQuestions()->offsetGet(0);
@@ -504,6 +526,14 @@ class CoursesDAO extends DAO{
         return $array;
     }
     
+    public function updateExercise (Exercises $exercise) {
+        $sql = sprintf($this->updateTasks, $exercise->getWeightTask(), $exercise->getIdTask());
+        if ($this->runQuery($sql)) {
+            $sql = sprintf($this->updateExercise, $exercise->getName(), $exercise->getDateLimit()->format("Y-m-d H:i:s"), $exercise->getReleased(), $exercise->getIdExercise(), $exercise->getIdTask());
+            return $this->runQuery($sql);
+        }
+    }
+    
     public function updateTimeCourse(Courses $course, Users $user) {
         $sql = sprintf($this->updateTimeCourse, $user->getTimeElapseCourse()->format("H:i:s"), $course->getId(), $user->getEmail());
         return $this->runQuery($sql);
@@ -848,8 +878,10 @@ class CoursesDAO extends DAO{
                     $exercise = new Exercises();
                     $exercise->setDateLimit(DateTime::createFromFormat("Y-m-d H:i:s", $rs[$i]['DateLimiteExercises']));
                     $exercise->setIdExercise($rs[$i]['IdExercises']);
+                    $exercise->setIdTask($rs[$i]['IdTasks']);
                     $exercise->setName($rs[$i]['NameExercises']);
                     $exercise->setReleased($rs[$i]['ReleasedExercises']);
+                    $exercise->setWeightTask($rs[$i]['WeightTask']);
                     $questions = new ArrayObject();
                     if ($rs[$i]['IdQuestion'] != null) {
                         $question = new Question();

@@ -100,6 +100,15 @@ class Rotas {
 	public static $VIEW_COURSE = "viewCourse";
 	public static $DELETE_COURSE = "deleteCourse";
 	public static $VIEW_EDIT_COURSE = "viewEditCourse";
+	public static $VIEW_ALL_EXERCISES = "viewAllExercises";
+	public static $VIEW_CREATE_EXERCISES = "viewCreateExercises";
+	public static $CREATE_NEW_EXERCISES = "createNewExercises";
+	public static $OPEN_EXERCISE_INSTRUCTOR = "openExerciseInstructor";
+	public static $INSERT_IMAGE = "insertImage";
+	public static $INSERT_QUESTION = "insertQuestion";
+	public static $SET_NEW_QUESTION = "setNewQuestion";
+	public static $VIEW_EDIT_EXERCISES = "viewEditExercises";
+	public static $EDIT_EXERCISES = "editExercises";
 	
 	//Códigos SubRotas Cursos
 	public static $COD_NEW_COURSE = 30;
@@ -127,13 +136,11 @@ class Rotas {
 	public static $ANSWER_FORUM = "answerForum";
 	public static $VIEW_CREATE_FORUM = "viewCreateForum";
 	public static $CREATE_NEW_FORUM = 'createNewForum';
-	public static $VIEW_ALL_EXERCISES = "viewAllExercises";
-	public static $VIEW_CREATE_EXERCISES = "viewCreateExercises";
-	public static $CREATE_NEW_EXERCISES = "createNewExercises";
-	public static $OPEN_EXERCISE_INSTRUCTOR = "openExerciseInstructor";
-	public static $INSERT_IMAGE = "insertImage";
-	public static $INSERT_QUESTION = "insertQuestion";
-	public static $SET_NEW_QUESTION = "setNewQuestion";
+	public static $VIEW_ALL_EXERCISES_STUDENTS = 'viewAllExercisesStudents';
+	public static $OPEN_EXERCISE_STUDENT = 'openExerciseStudent';
+	public static $UPDATE_COMPOSITION_QUESTION = 'updateCompositionQuestion';
+	public static $FINISH_EXERCISES = 'finishExercises';
+	
 	
 	//SubRotas Cursos Instrutor
 	public static $COD_OPEN_COURSE = 38;

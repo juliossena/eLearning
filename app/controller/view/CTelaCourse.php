@@ -1,7 +1,7 @@
 <?php
 
 $requiresCTC[] = 'app/controller/view/CTela.php';
-$requiresCTC[] = 'app/view/courses/Vcourses.php';
+$requiresCTC[] = 'app/view/courses/VCourses.php';
 $requiresCTC[] = 'app/dao/FilterCourses.php';
 $requiresCTC[] = 'app/dao/CoursesDAO.php';
 $requiresCTC[] = 'app/config/Commands.php';

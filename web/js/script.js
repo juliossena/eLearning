@@ -628,5 +628,57 @@ $(function(){
 			}
 			return false;
 		});
+		
+		$("form#editExercise").submit(function(){
+			if ($('input[name=released]').prop('checked')) {
+				$released = 1;
+			} else {
+				$released = 0;
+			}
+			$idExercise = $('input[name=idExercise]').val();
+			$nameExercise = $('input[name=nameExercise]').val();
+			$weightExercise = $('input[name=weightExercise]').val();
+			$dateLimit = $('input[name=dateLimit]').val();
+			$idTask = $('input[name=idTask]').val();
+			if ($nameExercise == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=nameExercise]').focus();
+			} else if ($weightExercise == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=weightExercise]').focus();
+			} else if ($dateLimit == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=dateLimit]').focus();
+			} else  {
+				$.ajax({
+					type: 'POST',
+					url: $('input[name=rota]').val(),
+					data: {
+						"idExercise": $idExercise,
+						"idTask": $idTask,
+						"nameExercise": $nameExercise,
+						"weightExercise": $weightExercise,
+						"dateLimit": $dateLimit,
+						"released": $released
+					}
+				}).done(function(e){
+					$("#result").html(e);
+				});
+			}
+			return false;
+		});
+		
+		$("form#sendQuestionStudent").change(function(){
+			$.ajax({
+				type: 'POST',
+				contentType: false,
+	    	    cache: false,
+				processData:false,
+				url: $('input[name=rota]').val(),
+				data:  new FormData(this),
+			}).done(function(e){
+			});
+			return false;
+		});
 	
 });

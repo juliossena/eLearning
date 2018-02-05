@@ -43,6 +43,19 @@ class VCourses implements View {
         $this->content = $this->newQuestion();
     }
     
+    public function setViewFinishExercises (Courses $course) {
+        $exercise = $course->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            $return = '';
+            $return .= '<h1 style="color: #800000;">¡Atención! Al finalizar el ejercicio no será posible modificarlo después.</h1>
+                    <button onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_EXERCISE_STUDENT."&idExercise=".$exercise->getIdExercise()."'".')">Cancelar</button>
+                    <button>Finalizar Tarea</button>
+                ';
+        }
+        
+        $this->content = $return;
+    }
+    
     public function newQuestion ($numberBody = 1) {
         if (isset($_REQUEST['numberBody'])) {
             $numberBody = $_REQUEST['numberBody'];
@@ -109,6 +122,99 @@ class VCourses implements View {
                     }
                 }
             }
+        }
+        $this->content = $return;
+    }
+    
+    public function setViewOpenExercisesStudents (Courses $course, Exercises $exercisesUser) {
+        $return = '';
+        $idExercise = $_REQUEST['idExercise'];
+        $exercise = $course->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
+                        <script type="text/javascript" src="js/script.js"></script>
+                        <div id="bodyLateral" class="bodyLateralMenuSelected">
+                            <button onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$FINISH_EXERCISES."&idExercise=".$exercise->getIdExercise()."'".')" style="float: right;">Finalizar Tarea</button>
+            ';
+            for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
+                $question = $exercise->getQuestions()->offsetGet($k);
+                if ($question instanceof Question) {
+                    $return .= '<form id="sendQuestionStudent">
+                    <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_STUDENTS.'&subSite='.Rotas::$UPDATE_COMPOSITION_QUESTION.'">
+                    <input type="hidden" name="idExercise" value="'.$exercise->getIdExercise().'">';
+                    if ($k == 0) {
+                        $return .= '<div id="body_'. ($k + 1) .'">';
+                    } else {
+                        $return .= '<div style="display: none;" id="body_'. ($k + 1) .'">';
+                    }
+                    $return .= '<h1>Pregunta '.$question->getSequence().'</h1>';
+                    for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
+                        $compostion = $question->getCompositionQuestion()->offsetGet($i);
+                        if ($compostion instanceof CompositionQuestion) {
+                            if ($compostion->getType() == 1 || $compostion->getType() == 2) {
+                                if ($compostion->getLink() != '') {
+                                    $return .= '<p class="pImg"><img src="'.$compostion->getLink().'"></p>';
+                                } else {
+                                    $return .= '<p>'.$compostion->getText().'</p>';
+                                }
+                            } else {
+                                $compositionSelected = false;
+                                for ($j = 0 ; $j < $exercisesUser->getQuestions()->count() ; $j++) {
+                                    $questionUser = $exercisesUser->getQuestions()->offsetGet($j);
+                                    if ($questionUser instanceof Question) {
+                                        for ($l = 0 ; $l < $questionUser->getCompositionQuestion()->count() ; $l++) {
+                                            $compostionUser = $questionUser->getCompositionQuestion()->offsetGet($l);
+                                            if ($compostionUser instanceof CompositionQuestion) {
+                                                if ($compostionUser->getSequence() == $compostion->getSequence() && $questionUser->getId() == $question->getId() && $exercisesUser->getIdExercise() == $exercise->getIdExercise()) {
+                                                    $compositionSelected = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if ($compostion->getLink() != '') {
+                                    if ($compositionSelected) {
+                                        $return .= '<div class="radioQuestion"><input type="radio" checked value="'.$compostion->getSequence().'" name="que_'.$question->getId().'" id="'.$question->getId().'op_'.$compostion->getSequence().'"><label for="'.$question->getId().'op_'.$compostion->getSequence().'"><span><img src="'.$compostion->getLink().'"></span></label></div>';
+                                    } else {
+                                        $return .= '<div class="radioQuestion"><input type="radio" value="'.$compostion->getSequence().'" name="que_'.$question->getId().'" id="'.$question->getId().'op_'.$compostion->getSequence().'"><label for="'.$question->getId().'op_'.$compostion->getSequence().'"><span><img src="'.$compostion->getLink().'"></span></label></div>';
+                                    }
+                                } else {
+                                    if ($compositionSelected) {
+                                        $return .= '<div class="radioQuestion"><input type="radio" checked value="'.$compostion->getSequence().'" name="que_'.$question->getId().'" id="'.$question->getId().'op_'.$compostion->getSequence().'"><label for="'.$question->getId().'op_'.$compostion->getSequence().'"><span>'.$compostion->getText().'</span></label></div>';
+                                    } else {
+                                        $return .= '<div class="radioQuestion"><input type="radio" value="'.$compostion->getSequence().'" name="que_'.$question->getId().'" id="'.$question->getId().'op_'.$compostion->getSequence().'"><label for="'.$question->getId().'op_'.$compostion->getSequence().'"><span>'.$compostion->getText().'</span></label></div>';
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                    $return .= '
+                        </div></form>';
+                }
+                
+            }
+            $return .= '
+                
+        		</div>
+        		<div class="lateralMenu">
+        			<ul id="ulLateralMenu">';
+            for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
+                $question = $exercise->getQuestions()->offsetGet($k);
+                if ($question instanceof Question) {
+                    if ($k == 0) {
+                        $return .= '<li id="'. ($k + 1) .'" class="selected" onclick="insertNewQuestion('. ($k + 1) .', ' . $idExercise . ')">Pregunta '. ($k + 1) .'</li>';
+                    } else {
+                        $return .= '<li id="'. ($k + 1) .'" onclick="insertNewQuestion('. ($k + 1) .', ' . $idExercise . ')">Pregunta '. ($k + 1) .'</li>';
+                    }
+                }
+            }
+            $return .= '<script>
+                            setNumberQuestion('. ($exercise->getQuestions()->count() + 1) .');
+                        </script>
+        			</ul>
+        		</div>';
         }
         $this->content = $return;
     }
@@ -219,6 +325,46 @@ class VCourses implements View {
         $this->content = $return;
     }
     
+    public function viewExercisesReleased (Exercises $exercise) {
+        if ($exercise->getReleased()) {
+            return '<input type="checkbox" name="released" value="1" checked>';
+        } else {
+            return '<input type="checkbox" name="released" value="1">';
+        }
+    }
+    
+    public function setViewEditExercises (Courses $course) {
+        $return = '';
+        $exercise = $course->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            $return .= '<script type="text/javascript" src="js/script.js"></script>
+                    <div id="result"></div>
+                    <form id="editExercise">
+                        <input type="hidden" value="index.php?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$EDIT_EXERCISES.'" name="rota">
+                        <input type="hidden" value="'.$exercise->getIdExercise().'" name="idExercise">
+                        <input type="hidden" value="'.$exercise->getIdTask().'" name="idTask">
+                        <table class="form">
+                            <tr>
+                                <td class="left">Título Ejercicio*
+                                <td class="right"><input name="nameExercise" value="'.$exercise->getName().'">
+                            <tr>
+                                <td class="left">Peso Ejercicio*
+                                <td class="right"><input name="weightExercise" value="'.$exercise->getWeightTask().'">
+                            <tr>
+                                <td class="left">Fecha Limite*
+                                <td class="right"><input name="dateLimit" value="'.$exercise->getDateLimit()->format("d/m/Y H:i:s").'">
+                            <tr>
+                                <td class="left">Liberado para los estudiantes
+                                <td class="right">'.$this->viewExercisesReleased($exercise).'
+                            <tr>
+                                <td colspan="2"><button type="submit">Guardar</button>
+                        </table>
+                    </form>';
+        }
+        
+        $this->content = $return;
+    }
+    
     public function setViewCreateExercises (Courses $course) {
         $return = '';
         
@@ -241,6 +387,44 @@ class VCourses implements View {
                                 <td colspan="2"><button type="submit">Create</button>
                         </table>
                     </form>';
+        
+        $this->content = $return;
+    }
+    
+    public function setViewAllExercisesStudent (ArrayObject $exercises, Courses $course) {
+        $return = '';
+        $return .= '
+        <button onclick="carregarPaginaAtivarCheck('."'#dadosNovaPagina', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CREATE_EXERCISES."&idCourse=".$course->getId()."'".')">Crear Nuevo Ejercicio</button>
+        <script type="text/javascript" src="js/jquery.quick.search.js"></script>
+        <input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Curso" />
+            <table class="lista-clientes" width="100%">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Fecha Data</th>
+                        <th colspan="2" class="actions"></th>
+                    </tr>
+                </thead>
+        ';
+
+        for ($i = 0 ; $i < $exercises->count() ; $i++) {
+            $exercise = $exercises->offsetGet($i);
+            if ($exercise instanceof Exercises) {
+                $return .= '
+                    <tr id="tr_'.$exercise->getIdExercise().'">
+                        <td align="center">'.$exercise->getName().'</td>
+                        <td align="center">'.$exercise->getDateLimit()->format("d/m/Y").'</td>
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_COURSE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
+                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_EXERCISE_STUDENT."&idExercise=".$exercise->getIdExercise()."'".')" src="imagens/enter.png">
+                    </tr>
+                ';
+            }
+        }
+        
+        
+        $return .= '</tbody>
+            </table>';
+        
         
         $this->content = $return;
     }
@@ -268,7 +452,7 @@ class VCourses implements View {
                     <tr id="tr_'.$exercise->getIdExercise().'">
                         <td align="center">'.$exercise->getName().'</td>
                         <td align="center">'.$exercise->getDateLimit()->format("d/m/Y").'</td>
-                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/editar.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_EDIT_EXERCISES."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/editar.png">
                         <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
                         <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_EXERCISE_INSTRUCTOR."&idExercise=".$exercise->getIdExercise()."'".')" src="imagens/enter.png">
                     </tr>
@@ -1037,12 +1221,6 @@ class VCourses implements View {
                     </div>
                                 
                     <div id="dataTab">
-                        <script>
-                            clearInterval(control);
-                            carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".');
-                            startCronometro ('."'".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('H')."', '".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('i')."', '".$course->getStudentsRegistered()->offsetGet(0)->getTimeElapseCourse()->format('s')."'".');
-                            $idCourse = '.$course->getId().';control = setInterval(cronometro,10);
-                        </script>
                     </div>
                                 
                 </div>
@@ -1062,7 +1240,7 @@ class VCourses implements View {
                 <li><a class="active-tab-menu" href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".')">Novedades</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_FILES_COURSE."&idCourse=".$course->getId()."'".')">Archivos</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_TASKS_COURSE."&idCourse=".$course->getId()."'".')">Rareas</a></li>
+                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_ALL_EXERCISES_STUDENTS."&idCourse=".$course->getId()."'".')">Rareas</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases en Vivo</a></li>
                 <li class="elapseTime">Tiempo de carrera: '.$this->viewTimeElapse($course->getStudentsRegistered()->offsetGet(0)).'</li>
