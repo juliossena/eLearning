@@ -19,6 +19,7 @@ class CoursesDAO extends DAO{
     private $nextAutoIncrementForum = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Forum'";
     private $nextAutoIncrementTasks = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Tasks'";
     private $nextAutoIncrementQuestion = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Question'";
+    private $insertTasksUser = "INSERT INTO TasksUsers (IdTasks, EmailUser, Percentagem) VALUES ('%s', '%s', '%s')";
     private $insertCourse = "INSERT INTO Courses (Id, Name, Description, DateNew, DateFinish, Information, Instructor, Password, CertifiedPercentage, MinimumTime) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
     private $insertCourseClass = "INSERT INTO CoursesAvailableClass (IdCourse, IdClass) VALUES %s";
     private $insertCourseUser = "INSERT INTO CoursesAvailableUser (IdCourse, EmailUser) VALUES %s";
@@ -58,7 +59,8 @@ class CoursesDAO extends DAO{
                         CAU.EmailUser as EmailUserAvailable, CCU.EmailUser as EmailUserConfig, CRU.EmailUser as EmailUserRegistered, 
                         CRU.TimeElapse, F.Id as IdForum, F.UserCreate as UserCreateForum, F.DateCreate as DateCreateForum, F.Title as TitleForum, UF.Name as NameUserForum,
                         A.Id as IdAnswer, A.UserCreate as UserCreateAnswer, A.DateCreate as DateCreateAnswer, A.Answer, UA.Name as NameUserAnswer,
-                        T.Id as IdTasks, T.WeightTask, FI.Id as IdFile, FI.Name as NameFile, FI.Thumbnail, FI.Link as LinkFile,
+                        T.Id as IdTasks, T.WeightTask, TU.Percentagem,
+                        FI.Id as IdFile, FI.Name as NameFile, FI.Thumbnail, FI.Link as LinkFile,
                         EX.Id as IdExercises, EX.Name as NameExercises, Ex.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises,
                         QU.Id as IdQuestion, QU.Difficulty as DifficultyQuestion, QU.Sequence as SequenceQuestion, 
                         CQ.Sequence as SequenceComposition, CQ.Type as TypeCompostion, CQ.Text as TextComposition, CQ.Link as LinkComposition, CQ.Answer as AnswerQuestion,
@@ -73,6 +75,7 @@ class CoursesDAO extends DAO{
                         left join Users as UF ON F.UserCreate = UF.Email
                         left join Users as UA ON A.UserCreate = UA.Email
                         left join Tasks as T ON C.Id = T.IdCourses
+                        left join TasksUsers as TU ON T.Id = TU.IdTasks
                         left join Exercises as EX ON T.Id = EX.IdTasks
                         left join Question as QU ON QU.IdExercises = EX.Id
                         left join CompositionQuestion as CQ ON CQ.IdQuestion = QU.Id
@@ -154,6 +157,14 @@ class CoursesDAO extends DAO{
         
         return $exercise;
         
+    }
+    
+    public function insertTasksUser (Users $user) {
+        $exercise = $user->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            $sql = sprintf($this->insertTasksUser, $exercise->getIdTask(), $user->getEmail(), $exercise->getPercentagem());
+            return $this->runQuery($sql);
+        }
     }
     
     public function insertQuestionDAO (Exercises $exercises) {
@@ -879,6 +890,7 @@ class CoursesDAO extends DAO{
                     $exercise->setDateLimit(DateTime::createFromFormat("Y-m-d H:i:s", $rs[$i]['DateLimiteExercises']));
                     $exercise->setIdExercise($rs[$i]['IdExercises']);
                     $exercise->setIdTask($rs[$i]['IdTasks']);
+                    $exercise->setPercentagem($rs[$i]['Percentagem']);
                     $exercise->setName($rs[$i]['NameExercises']);
                     $exercise->setReleased($rs[$i]['ReleasedExercises']);
                     $exercise->setWeightTask($rs[$i]['WeightTask']);

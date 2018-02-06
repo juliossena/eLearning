@@ -24,6 +24,20 @@ a {
 .texto {
 	text-align: justify;
 }
+
+h1.line{
+	margin-top: 15px;
+	margin-bottom: 15px;
+	width: 100%;
+	font-size: 16pt;
+	text-align: left;
+	padding: 10px;
+	border-bottom: 2px solid #800000;
+	margin-bottom: 20px;
+	text-shadow: 1px 1px 10px #ffffff;
+	
+}
+
 h2 {
 	font-size: 16pt;
 	font-family: 'ubuntu_menu';
@@ -1835,7 +1849,59 @@ div.radioQuestion input[type="radio"]:checked + label span{
 	color: white;
 }
 
+div.questionComposition {
+	text-align: left;
+	margin: 10px;
+	padding: 10px;
+	border: 1px solid #1C4592;
+	font-size: 9pt;
+	color: #1C4592;
+}
+
+div.questionCompositionFalse {
+	text-align: left;
+	margin: 10px;
+	padding: 10px;
+	padding-right: 40px;
+	font-size: 9pt;
+	border: 1px solid #800000;
+	background: url(../imagens/false.png) top right no-repeat;
+	background-color: #fff2f2;
+}
+
+div.questionCompositionTrue {
+	text-align: left;
+	margin: 10px;
+	padding: 10px;
+	font-size: 9pt;
+	border: 1px solid #008016;
+	background-color: #e8ffec;
+}
+
+div.questionCompositionTrueTrue {
+	text-align: left;
+	margin: 10px;
+	padding: 10px;
+	padding-right: 40px;
+	font-size: 9pt;
+	border: 1px solid #004221;
+	color: #b8e9ab;
+	background: url(../imagens/true.png) top right no-repeat;
+	background-color: #008040;
+}
+
 
 /*Término configuração das questões e alternativas*/
+
+
+div.resultTask {
+	margin: auto;
+	width: 150px;
+	padding: 20px;
+	font-size: 18pt;
+	color: #800000;
+	background-color: #cacaca;
+	text-align: center;
+}
 
 

@@ -420,10 +420,13 @@ class CTelaCourseStudent extends CTela{
                 
                 $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
                 
-                
-                
                 if ($course instanceof Courses) {
-                    $this->screen->setViewOpenExercisesStudents($course, $exerciseUser);
+                    if ($course->getExercises()->offsetGet(0)->getPercentagem() == null) {
+                        $this->screen->setViewOpenExercisesStudents($course, $exerciseUser);
+                    } else {
+                        $this->screen->setViewOpenExercisesStudentsFinish($course, $exerciseUser);
+                    }
+                    
                 }
                 
                 break;
@@ -471,7 +474,7 @@ class CTelaCourseStudent extends CTela{
                 
                 
                 break;
-            case Rotas::$FINISH_EXERCISES:
+            case Rotas::$CONFIRM_FINISH_EXERCISES:
                 $idExercise = $_REQUEST['idExercise'];
                 
                 $exercise = new Exercises();
@@ -504,9 +507,117 @@ class CTelaCourseStudent extends CTela{
                 }
                 
                 break;
+            case Rotas::$FINISH_EXERCISES:
+                $idExercise = $_REQUEST['idExercise'];
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $courses = new Courses();
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $courses->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filterCourse = new FilterCourses($courses);
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                
+                $user = $this->user;
+                
+                $newExercises = new ArrayObject();
+                $newExercise = new Exercises();
+                $newExercise->setIdExercise($idExercise);
+                $newExercises->append($newExercise);
+                
+                $user->setExercises($newExercises);
+                
+                $filterUser = new FilterUsers($user);
+                $userDAO = new UsersDAO();
+                
+                $user = $userDAO->getObjects($filterUser)->offsetGet(0);
+                
+                
+                
+                if ($course instanceof Courses && $user instanceof Users) {
+                    $hits = $this->questionsHits($course, $user->getExercises()->offsetGet(0));
+                    $qtdQuestion = $course->getExercises()->offsetGet(0)->getQuestions()->count();
+                    
+                    $exerciseUser = $user->getExercises()->offsetGet(0);
+                    
+                    if ($exerciseUser instanceof Exercises) {
+                        $exerciseUser->setPercentagem($hits / $qtdQuestion);
+                        $exerciseUser->setIdTask($course->getExercises()->offsetGet(0)->getIdTask());
+                        
+                        $user->getExercises()->offsetSet(0, $exerciseUser);
+                        
+                        if ($courseDAO->insertTasksUser($user)) {
+                            $this->screen->setViewResultTask($user->getExercises()->offsetGet(0));
+                        }
+                    }
+                }
+                
+                break;
+            case Rotas::$VIEW_DATA_EXERCISES:
+                $idExercise = $_REQUEST['idExercise'];
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $courses = new Courses();
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $courses->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filterCourse = new FilterCourses($courses);
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewExercise($course->getExercises()->offsetGet(0));
+                }
+                
+                break;
             default:
                 break;
         }
+    }
+    
+    private function questionsHits (Courses $course, Exercises $exerciseUser) {
+        $hits = 0;
+        $exercise = $course->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            for ($i = 0 ; $i < $exercise->getQuestions()->count() ; $i++) {
+                for ($j = 0 ; $j < $exerciseUser->getQuestions()->count() ; $j++) {
+                    $questionUser = $exerciseUser->getQuestions()->offsetGet($j);
+                    if ($questionUser instanceof Question) {
+                        $question = $exercise->getQuestions()->offsetGet($i);
+                        if ($question instanceof Question && $question->getId() == $questionUser->getId()) {
+                            for ($k = 0 ; $k < $question->getCompositionQuestion()->count() ; $k++) {
+                                $composition = $question->getCompositionQuestion()->offsetGet($k);
+                                if ($composition instanceof CompositionQuestion) {
+                                    if ($composition->getAnswer()) {
+                                        $compositionUser = $questionUser->getCompositionQuestion()->offsetGet(0);
+                                        if ($composition->getSequence() == $compositionUser->getSequence()) {
+                                            $hits++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }
+        }
+        
+        return $hits;
     }
     
 }

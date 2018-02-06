@@ -43,13 +43,55 @@ class VCourses implements View {
         $this->content = $this->newQuestion();
     }
     
+    public function setViewExerciseInstructor (Exercises $exercise) {
+        $return = '';
+        $return .= '<h1 class="line">Información</h1>
+                    <p style="text-align: justify;">Quantidade de questões: '.$exercise->getQuestions()->count().'</p>
+                    <p style="text-align: justify;">Peso do exercicio: '.$exercise->getWeightTask().'</p>';
+        $return .= '<h1 class="line">Resultados</h1>';
+        if ($exercise->getPercentagem() != null) {
+            $this->setViewResultTask($exercise);
+            $return .= $this->content;
+        } else {
+            $return .= 'Exercicio não foi finalizado';
+        }
+        
+        
+        $this->content = $return;
+    }
+    
+    public function setViewExercise (Exercises $exercise) {
+        $return = '';
+        $return .= '<h1 class="line">Información</h1>
+                    <p style="text-align: justify;">Quantidade de questões: '.$exercise->getQuestions()->count().'</p>
+                    <p style="text-align: justify;">Peso do exercicio: '.$exercise->getWeightTask().'</p>';
+        $return .= '<h1 class="line">Resultado</h1>';
+        if ($exercise->getPercentagem() != null) {
+            $this->setViewResultTask($exercise);
+            $return .= $this->content;
+        } else {
+            $return .= 'Exercicio não foi finalizado';
+        }
+        
+        
+        $this->content = $return;
+    }
+    
+    public function setViewResultTask (Exercises $exercise) {
+        $return = '';
+        $return .= '<div class="resultTask">' . number_format(($exercise->getPercentagem() * 100), 2, ',', ' ') . '%</div>';
+        
+        
+        $this->content = $return;
+    }
+    
     public function setViewFinishExercises (Courses $course) {
         $exercise = $course->getExercises()->offsetGet(0);
         if ($exercise instanceof Exercises) {
             $return = '';
             $return .= '<h1 style="color: #800000;">¡Atención! Al finalizar el ejercicio no será posible modificarlo después.</h1>
                     <button onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_EXERCISE_STUDENT."&idExercise=".$exercise->getIdExercise()."'".')">Cancelar</button>
-                    <button>Finalizar Tarea</button>
+                    <button onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$FINISH_EXERCISES."&idExercise=".$exercise->getIdExercise()."'".')">Finalizar Tarea</button>
                 ';
         }
         
@@ -126,6 +168,103 @@ class VCourses implements View {
         $this->content = $return;
     }
     
+    public function setViewOpenExercisesStudentsFinish (Courses $course, Exercises $exercisesUser) {
+        $return = '';
+        $idExercise = $_REQUEST['idExercise'];
+        $exercise = $course->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
+                        <script type="text/javascript" src="js/script.js"></script>
+                        <div id="bodyLateral" class="bodyLateralMenuSelected">
+            ';
+            for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
+                $question = $exercise->getQuestions()->offsetGet($k);
+                if ($question instanceof Question) {
+                    if ($k == 0) {
+                        $return .= '<div id="body_'. ($k + 1) .'">';
+                    } else {
+                        $return .= '<div style="display: none;" id="body_'. ($k + 1) .'">';
+                    }
+                    $return .= '<h1>Pregunta '.$question->getSequence().'</h1>';
+                    for ($i = 0 ; $i < $question->getCompositionQuestion()->count() ; $i++) {
+                        $compostion = $question->getCompositionQuestion()->offsetGet($i);
+                        if ($compostion instanceof CompositionQuestion) {
+                            if ($compostion->getType() == 1 || $compostion->getType() == 2) {
+                                if ($compostion->getLink() != '') {
+                                    $return .= '<p class="pImg"><img src="'.$compostion->getLink().'"></p>';
+                                } else {
+                                    $return .= '<p>'.$compostion->getText().'</p>';
+                                }
+                            } else {
+                                $compositionSelected = false;
+                                for ($j = 0 ; $j < $exercisesUser->getQuestions()->count() ; $j++) {
+                                    $questionUser = $exercisesUser->getQuestions()->offsetGet($j);
+                                    if ($questionUser instanceof Question) {
+                                        for ($l = 0 ; $l < $questionUser->getCompositionQuestion()->count() ; $l++) {
+                                            $compostionUser = $questionUser->getCompositionQuestion()->offsetGet($l);
+                                            if ($compostionUser instanceof CompositionQuestion) {
+                                                if ($compostionUser->getSequence() == $compostion->getSequence() && $questionUser->getId() == $question->getId() && $exercisesUser->getIdExercise() == $exercise->getIdExercise()) {
+                                                    $compositionSelected = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if ($compostion->getLink() != '') {
+                                    if ($compositionSelected && $compostion->getAnswer()) {
+                                        $return .= '<div class="questionCompositionTrueTrue"><img src="'.$compostion->getLink().'"></div>';
+                                    } else if($compositionSelected) {
+                                        $return .= '<div class="questionCompositionFalse"><img src="'.$compostion->getLink().'"></div>';
+                                    } else  if($compostion->getAnswer()) {
+                                        $return .= '<div class="questionCompositionTrue"><img src="'.$compostion->getLink().'"></div>';
+                                    } else {
+                                        $return .= '<div class="questionComposition"><img src="'.$compostion->getLink().'"></div>';
+                                    }
+                                } else {
+                                    if ($compositionSelected && $compostion->getAnswer()) {
+                                        $return .= '<div class="questionCompositionTrueTrue">'.$compostion->getText().'</div>';
+                                    } else if($compositionSelected) {
+                                        $return .= '<div class="questionCompositionFalse">'.$compostion->getText().'</div>';
+                                    } else if($compostion->getAnswer()) {
+                                        $return .= '<div class="questionCompositionTrue">'.$compostion->getText().'</div>';
+                                    } else {
+                                        $return .= '<div class="questionComposition">'.$compostion->getText().'</div>';
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                    $return .= '
+                        </div>';
+                }
+                
+            }
+            $return .= '
+                
+        		</div>
+        		<div class="lateralMenu">
+        			<ul id="ulLateralMenu">';
+            for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
+                $question = $exercise->getQuestions()->offsetGet($k);
+                if ($question instanceof Question) {
+                    if ($k == 0) {
+                        $return .= '<li id="'. ($k + 1) .'" class="selected" onclick="insertNewQuestion('. ($k + 1) .', ' . $idExercise . ')">Pregunta '. ($k + 1) .'</li>';
+                    } else {
+                        $return .= '<li id="'. ($k + 1) .'" onclick="insertNewQuestion('. ($k + 1) .', ' . $idExercise . ')">Pregunta '. ($k + 1) .'</li>';
+                    }
+                }
+            }
+            $return .= '<script>
+                            setNumberQuestion('. ($exercise->getQuestions()->count() + 1) .');
+                        </script>
+        			</ul>
+        		</div>';
+        }
+        $this->content = $return;
+    }
+    
     public function setViewOpenExercisesStudents (Courses $course, Exercises $exercisesUser) {
         $return = '';
         $idExercise = $_REQUEST['idExercise'];
@@ -134,7 +273,7 @@ class VCourses implements View {
             $return .= '<script type="text/javascript" src="js/lateralMenu.js"></script>
                         <script type="text/javascript" src="js/script.js"></script>
                         <div id="bodyLateral" class="bodyLateralMenuSelected">
-                            <button onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$FINISH_EXERCISES."&idExercise=".$exercise->getIdExercise()."'".')" style="float: right;">Finalizar Tarea</button>
+                            <button onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$CONFIRM_FINISH_EXERCISES."&idExercise=".$exercise->getIdExercise()."'".')" style="float: right;">Finalizar Tarea</button>
             ';
             for ($k = 0 ; $k < $exercise->getQuestions()->count() ; $k++) {
                 $question = $exercise->getQuestions()->offsetGet($k);
@@ -394,7 +533,6 @@ class VCourses implements View {
     public function setViewAllExercisesStudent (ArrayObject $exercises, Courses $course) {
         $return = '';
         $return .= '
-        <button onclick="carregarPaginaAtivarCheck('."'#dadosNovaPagina', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CREATE_EXERCISES."&idCourse=".$course->getId()."'".')">Crear Nuevo Ejercicio</button>
         <script type="text/javascript" src="js/jquery.quick.search.js"></script>
         <input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Curso" />
             <table class="lista-clientes" width="100%">
@@ -414,7 +552,7 @@ class VCourses implements View {
                     <tr id="tr_'.$exercise->getIdExercise().'">
                         <td align="center">'.$exercise->getName().'</td>
                         <td align="center">'.$exercise->getDateLimit()->format("d/m/Y").'</td>
-                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_COURSE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_DATA_EXERCISES."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
                         <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_EXERCISE_STUDENT."&idExercise=".$exercise->getIdExercise()."'".')" src="imagens/enter.png">
                     </tr>
                 ';
@@ -896,6 +1034,7 @@ class VCourses implements View {
         $return .= '
         <script type="text/javascript" src="js/jquery.quick.search.js"></script>
         <input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Curso" />
+        <h1 class="line">Cursos Disponibles</h1>
             <table class="lista-clientes" width="100%">
                 <thead>
                     <tr>
@@ -928,6 +1067,7 @@ class VCourses implements View {
             </table>';
         
         $return .= '
+        <h1 class="line">Cursos Matriculados</h1>
             <table class="lista-clientes" width="100%">
                 <thead>
                     <tr>

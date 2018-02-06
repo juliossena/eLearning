@@ -31,7 +31,16 @@ class FilterUsers extends FilterSearch {
         
         if ($this->users != null) {
             if ($this->users instanceof Users) {
-                if ($this->users->getEmail() != null && $this->users->getPassword() != null) {
+                if ($this->users->getEmail() != null && $this->users->getExercises() != null && $this->users->getExercises()->count() > 0) {
+                    $exercise = $this->users->getExercises()->offsetGet(0);
+                    if ($exercise instanceof Exercises) {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "Email LIKE '%s' AND Password LIKE '%s' AND UCO.IdExercises LIKE '%s'",
+                            $this->users->getEmail(),
+                            $this->users->getPassword(),
+                            $exercise->getIdExercise());
+                    }
+                }else if ($this->users->getEmail() != null && $this->users->getPassword() != null) {
                     $pesquisa = $this->getCampo($pesquisa) . sprintf(
                         "Email LIKE '%s' AND Password LIKE '%s'",
                         $this->users->getEmail(),

@@ -3,6 +3,7 @@
 class Tasks {
     private $idTask;
     private $weightTask;
+    private $percentagem;
     
     public function getIdTask() {
         return $this->idTask;
@@ -18,6 +19,14 @@ class Tasks {
     
     public function setWeightTask($weightTask) {
         $this->weightTask = $weightTask;
+    }
+    
+    public function getPercentagem() {
+        return $this->percentagem;
+    }
+    
+    public function setPercentagem($percentagem) {
+        $this->percentagem = $percentagem;
     }
     
     

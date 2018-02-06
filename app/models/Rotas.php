@@ -139,7 +139,9 @@ class Rotas {
 	public static $VIEW_ALL_EXERCISES_STUDENTS = 'viewAllExercisesStudents';
 	public static $OPEN_EXERCISE_STUDENT = 'openExerciseStudent';
 	public static $UPDATE_COMPOSITION_QUESTION = 'updateCompositionQuestion';
+	public static $CONFIRM_FINISH_EXERCISES = 'confirmFinishExercises';
 	public static $FINISH_EXERCISES = 'finishExercises';
+	public static $VIEW_DATA_EXERCISES = 'viewDataExercises';
 	
 	
 	//SubRotas Cursos Instrutor

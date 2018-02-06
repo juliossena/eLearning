@@ -93,7 +93,8 @@ class FilterCourses extends FilterSearch {
                 $student = $this->courses->getStudents()->offsetGet(0);
                 if ($student instanceof Users) {
                     $pesquisa = $this->getCampo($pesquisa) . sprintf(
-                        "(CAU.EmailUser LIKE '%s' OR UC.EmailUsers LIKE '%s') AND CRU.EmailUser IS NULL",
+                        "(CAU.EmailUser LIKE '%s' OR UC.EmailUsers LIKE '%s') AND CRU.EmailUser NOT LIKE '%s'",
+                        $student->getEmail(),
                         $student->getEmail(),
                         $student->getEmail());
                 }
