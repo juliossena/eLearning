@@ -80,9 +80,13 @@ class ControlIndex {
 			        }
 			        break;
 			    case Rotas::$OPEN_IMG_PERFIL:
-			        $email = $_REQUEST['emailUser'];
-			        echo Commands::downloadArquivo('dados/perfis/', $email . '.jpg', 'image/jpeg');
-			        break;
+    		        $email = $_REQUEST['emailUser'];
+    		        if (file_exists('../dados/perfis/' . $email . '.jpg')) {
+		              echo Commands::downloadArquivo('dados/perfis/', $email . '.jpg', 'image/jpeg');
+    		        } else {
+    		            echo Commands::downloadArquivo('dados/perfis/', 'usuario.jpg', 'image/jpeg');
+    		        }
+    		        break;
 			    case Rotas::$OPEN_IMG:
 			        $nameImg = $_REQUEST['nameImg'];
 			        echo Commands::downloadArquivo('dados/imgs/', $nameImg, 'image/jpeg');

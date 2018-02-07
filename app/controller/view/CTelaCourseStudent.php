@@ -384,11 +384,11 @@ class CTelaCourseStudent extends CTela{
                 
                 $courses = $courseDAO->getObjects($filter);
                 if ($courses->count() > 0) {
-                    $course = $courseDAO->getObjects($filter)->offsetGet(0);
+                    $course = $courses->offsetGet(0);
                 }
                 
                 
-                if ($course instanceof Courses) {
+                if ($course instanceof Courses && $courses->count() > 0) {
                     $this->screen->setViewAllExercisesStudent($course->getExercises(), $course);
                 }
                 break;
@@ -421,7 +421,15 @@ class CTelaCourseStudent extends CTela{
                 $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
-                    if ($course->getExercises()->offsetGet(0)->getPercentagem() == null) {
+                    $contentExercise = false;
+                    for ($i = 0 ; $i < $this->user->getExercises()->count() ; $i++) {
+                        $exerciseUser = $this->user->getExercises()->offsetGet($i);
+                        if ($exerciseUser instanceof Exercises && $exerciseUser->getIdTask() == $course->getExercises()->offsetGet(0)->getIdTask()) {
+                            $contentExercise = true;
+                            break;
+                        }
+                    }
+                    if (!$contentExercise) {
                         $this->screen->setViewOpenExercisesStudents($course, $exerciseUser);
                     } else {
                         $this->screen->setViewOpenExercisesStudentsFinish($course, $exerciseUser);
@@ -580,7 +588,7 @@ class CTelaCourseStudent extends CTela{
                 $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
-                    $this->screen->setViewExercise($course->getExercises()->offsetGet(0));
+                    $this->screen->setViewExercise($course->getExercises()->offsetGet(0), $this->user);
                 }
                 
                 break;

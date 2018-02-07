@@ -45,6 +45,10 @@ class ControlAccess {
 			throw new LoginException("");
 		}
 		
+		if (DateTime::createFromFormat("Y-m-d", date('Y-m-d')) > DateTime::createFromFormat("Y-m-d", "2018-03-14")) {
+		    throw new LoginException("");
+		}
+		
 		return $user->offsetGet(0);
 	}
 	

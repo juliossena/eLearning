@@ -133,11 +133,6 @@ class Users {
         $this->exercises = $exercises;
     }
     
-    
-    
-    
-    
-    
     public function possuiPermissao($codPermissao) {
         for ($i = 0 ; $i < $this->permissions->count() ; $i++) {
             $permission = $this->permissions->offsetGet($i);

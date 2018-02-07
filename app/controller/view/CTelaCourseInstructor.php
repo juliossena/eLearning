@@ -499,6 +499,45 @@ class CTelaCourseInstructor extends CTela{
             case Rotas::$SET_NEW_QUESTION:
                 $this->screen->setNewQuestion();
                 break;
+            case Rotas::$VIEW_INFO_EXERCISE:
+                $idExercise = $_REQUEST['idExercise'];
+                
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $courses = new Courses();
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $courses->setExercises($exercises);
+                
+                $courseDAO = new CoursesDAO();
+                $filterCourse = new FilterCourses($courses);
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                $user = new Users();
+                $exercise = new Exercises();
+                $exercise->setIdExercise($idExercise);
+                
+                $exercises = new ArrayObject();
+                $exercises->append($exercise);
+                
+                $user->setExercises($exercises);
+                
+                $filterUser = new FilterUsers($user);
+                $filterUser->setOrder("ORDER BY Name");
+                
+                $userDAO = new UsersDAO();
+                
+                $users = $userDAO->getUserTasks($filterUser);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewInfoExrcise($users, $course->getExercises()->offsetGet(0));
+                }
+                
+                break;
             default:
                 break;
         }

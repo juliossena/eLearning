@@ -43,6 +43,39 @@ class VCourses implements View {
         $this->content = $this->newQuestion();
     }
     
+    public function setViewInfoExrcise (ArrayObject $users, Exercises $exercise) {
+        $return = '';
+        $return .= '<h1 class="line">Información</h1>
+                    <p style="text-align: justify;">Quantidade de questões: '.$exercise->getQuestions()->count().'</p>
+                    <p style="text-align: justify;">Peso do exercicio: '.$exercise->getWeightTask().'</p>';
+        $return .= '<h1 class="line">Resultados</h1>
+                    <table class="lista-clientes"  width="100%">
+                <thead>
+                    <tr>
+                        <th>Nombre
+                        <th>Nota
+                </thead>
+        ';
+        
+        for ($i = 0 ; $i < $users->count() ; $i++) {
+            $user = $users->offsetGet($i);
+            if ($user instanceof Users) {
+                $exercise = $user->getExercises()->offsetGet(0);
+                if ($exercise instanceof Exercises) {
+                    $return .= '<tr>
+                                    <td>'.$user->getName().'
+                                    <td>'. number_format(($exercise->getPercentagem() * 100), 2, ',', ' ') .'%
+                    ';
+                }
+            }
+            
+        }
+        
+        $return .= '</table>';
+        
+        $this->content = $return;
+    }
+    
     public function setViewExerciseInstructor (Exercises $exercise) {
         $return = '';
         $return .= '<h1 class="line">Información</h1>
@@ -60,14 +93,23 @@ class VCourses implements View {
         $this->content = $return;
     }
     
-    public function setViewExercise (Exercises $exercise) {
+    public function setViewExercise (Exercises $exercise, Users $user) {
         $return = '';
         $return .= '<h1 class="line">Información</h1>
                     <p style="text-align: justify;">Quantidade de questões: '.$exercise->getQuestions()->count().'</p>
                     <p style="text-align: justify;">Peso do exercicio: '.$exercise->getWeightTask().'</p>';
         $return .= '<h1 class="line">Resultado</h1>';
-        if ($exercise->getPercentagem() != null) {
-            $this->setViewResultTask($exercise);
+        $contentExercise = false;
+        for ($i = 0 ; $i < $user->getExercises()->count() ; $i++) {
+            $exerciseUser = $user->getExercises()->offsetGet($i);
+            if ($exerciseUser instanceof Exercises && $exerciseUser->getIdExercise() == $exercise->getIdExercise()) {
+                $contentExercise = true;
+                break;
+            }
+        }
+        
+        if ($contentExercise) {
+            $this->setViewResultTask($exerciseUser);
             $return .= $this->content;
         } else {
             $return .= 'Exercicio não foi finalizado';
@@ -298,14 +340,16 @@ class VCourses implements View {
                                 }
                             } else {
                                 $compositionSelected = false;
-                                for ($j = 0 ; $j < $exercisesUser->getQuestions()->count() ; $j++) {
-                                    $questionUser = $exercisesUser->getQuestions()->offsetGet($j);
-                                    if ($questionUser instanceof Question) {
-                                        for ($l = 0 ; $l < $questionUser->getCompositionQuestion()->count() ; $l++) {
-                                            $compostionUser = $questionUser->getCompositionQuestion()->offsetGet($l);
-                                            if ($compostionUser instanceof CompositionQuestion) {
-                                                if ($compostionUser->getSequence() == $compostion->getSequence() && $questionUser->getId() == $question->getId() && $exercisesUser->getIdExercise() == $exercise->getIdExercise()) {
-                                                    $compositionSelected = true;
+                                if ($exercisesUser->getQuestions() != null) {
+                                    for ($j = 0 ; $j < $exercisesUser->getQuestions()->count() ; $j++) {
+                                        $questionUser = $exercisesUser->getQuestions()->offsetGet($j);
+                                        if ($questionUser instanceof Question) {
+                                            for ($l = 0 ; $l < $questionUser->getCompositionQuestion()->count() ; $l++) {
+                                                $compostionUser = $questionUser->getCompositionQuestion()->offsetGet($l);
+                                                if ($compostionUser instanceof CompositionQuestion) {
+                                                    if ($compostionUser->getSequence() == $compostion->getSequence() && $questionUser->getId() == $question->getId() && $exercisesUser->getIdExercise() == $exercise->getIdExercise()) {
+                                                        $compositionSelected = true;
+                                                    }
                                                 }
                                             }
                                         }
@@ -591,7 +635,7 @@ class VCourses implements View {
                         <td align="center">'.$exercise->getName().'</td>
                         <td align="center">'.$exercise->getDateLimit()->format("d/m/Y").'</td>
                         <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_EDIT_EXERCISES."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/editar.png">
-                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_COURSE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_INFO_EXERCISE."&idExercise=".$exercise->getIdExercise()."')".'" src="imagens/view.png">
                         <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_EXERCISE_INSTRUCTOR."&idExercise=".$exercise->getIdExercise()."'".')" src="imagens/enter.png">
                     </tr>
                 ';
@@ -1048,17 +1092,27 @@ class VCourses implements View {
         
         for ($i = 0 ; $i < $arrayAvailable->count() ; $i++) {
             $course = $arrayAvailable->offsetGet($i);
-            if ($course instanceof Courses) {
+            $repeated = false;
+            for ($j = 0 ; $j < $arrayRegistered->count() ; $j++) {
+                $couseR = $arrayRegistered->offsetGet($j);
+                if ($course instanceof Courses) {
+                    if ($couseR->getId() == $course->getId()) {
+                        $repeated = true;
+                    }
+                }
+                
+            }
+            if (!$repeated) {
                 $return .= '
-                    <tr id="tr_'.$course->getId().'">
-                        <td align="center">'.$course->getName().'</td>
-                        <td align="center">'.$course->getDescription().'</td>
-                        <td align="center">'.$course->getDateFinish()->format("d/m/Y").'</td>
-                        <td>'.$this->insertImgBlocked($course).'
-                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES."&subSite=".Rotas::$VIEW_COURSE."&idCourse=".$course->getId()."')".'" src="imagens/view.png">
-                        <td><img class="imgButton" onclick="registeredCourse('."'".$course->getId()."', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$REGISTERED_COURSE."', '?site=".Rotas::$COURSES_STUDENTS."'".')" src="imagens/registered.png">
-                    </tr>
-                ';
+                        <tr id="tr_'.$course->getId().'">
+                            <td align="center">'.$course->getName().'</td>
+                            <td align="center">'.$course->getDescription().'</td>
+                            <td align="center">'.$course->getDateFinish()->format("d/m/Y").'</td>
+                            <td>'.$this->insertImgBlocked($course).'
+                            <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES."&subSite=".Rotas::$VIEW_COURSE."&idCourse=".$course->getId()."')".'" src="imagens/view.png">
+                            <td><img class="imgButton" onclick="registeredCourse('."'".$course->getId()."', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$REGISTERED_COURSE."', '?site=".Rotas::$COURSES_STUDENTS."'".')" src="imagens/registered.png">
+                        </tr>
+                    ';
             }
         }
         
@@ -1346,7 +1400,6 @@ class VCourses implements View {
     public function setViewOpenCourseInstructor (Courses $course) {
         $return = '';
         $return .= '<script type="text/javascript" src="js/script.js"></script>
-            
             <div class="content">
                 <div class="tabs-content">
                     <div class="tabs-menu clearfix">
@@ -1354,18 +1407,20 @@ class VCourses implements View {
                             <li><a class="active-tab-menu" href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".')">Novedades</a></li>
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FILES_COURSE."&idCourse=".$course->getId()."'".')">Archivos</a></li>
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
-                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_ALL_EXERCISES."&idCourse=".$course->getId()."'".')">Rareas</a></li>
-                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases</a></li>
-                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases en Vivo</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_ALL_EXERCISES."&idCourse=".$course->getId()."'".')">Ejercicios</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Tareas</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Resultados</a></li>
                         </ul>
                     </div>
                                 
                     <div id="dataTab">
+                        <script>
+                            carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".');
+                        </script>
                     </div>
                                 
                 </div>
             </div>';
-        
         $this->content = $return;
     }
     
@@ -1380,9 +1435,9 @@ class VCourses implements View {
                 <li><a class="active-tab-menu" href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_NEWS_COURSE."&idCourse=".$course->getId()."'".')">Novedades</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_FILES_COURSE."&idCourse=".$course->getId()."'".')">Archivos</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_ALL_EXERCISES_STUDENTS."&idCourse=".$course->getId()."'".')">Rareas</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Clases en Vivo</a></li>
+                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_ALL_EXERCISES_STUDENTS."&idCourse=".$course->getId()."'".')">Ejercicios</a></li>
+                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Tareas</a></li>
+                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Notas</a></li>
                 <li class="elapseTime">Tiempo de carrera: '.$this->viewTimeElapse($course->getStudentsRegistered()->offsetGet(0)).'</li>
             </ul>
         </div>

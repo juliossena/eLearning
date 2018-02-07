@@ -43,8 +43,9 @@ class FilterCourses extends FilterSearch {
                 if ($exercise instanceof Exercises) {
                     if ($exercise->getReleased() != null) {
                         $pesquisa = $this->getCampo($pesquisa) . sprintf(
-                            "EX.Released LIKE '%s'",
-                            $exercise->getReleased());
+                            "EX.Released LIKE '%s' AND C.Id LIKE '%s'",
+                            $exercise->getReleased(),
+                            $this->courses->getId());
                     } else if ($exercise->getQuestions() != null && $exercise->getQuestions()->count() > 0) {
                         $question = $exercise->getQuestions()->offsetGet(0);
                         if ($question instanceof Question) {
@@ -93,8 +94,7 @@ class FilterCourses extends FilterSearch {
                 $student = $this->courses->getStudents()->offsetGet(0);
                 if ($student instanceof Users) {
                     $pesquisa = $this->getCampo($pesquisa) . sprintf(
-                        "(CAU.EmailUser LIKE '%s' OR UC.EmailUsers LIKE '%s') AND CRU.EmailUser NOT LIKE '%s'",
-                        $student->getEmail(),
+                        "CAU.EmailUser LIKE '%s' OR UC.EmailUsers LIKE '%s'",
                         $student->getEmail(),
                         $student->getEmail());
                 }

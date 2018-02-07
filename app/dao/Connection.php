@@ -25,7 +25,7 @@ class Connection {
 	}
 	
 	public function runSelect($sql) {
- 		echo $sql . "<br>";
+// 		echo $sql . "<br>";
 		$stm = $this->connect()->prepare($sql);
 		$stm->execute();
 		return $stm->fetchAll(PDO::FETCH_ASSOC);

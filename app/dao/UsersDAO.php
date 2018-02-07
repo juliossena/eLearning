@@ -22,11 +22,24 @@ class UsersDAO extends DAO{
     private $insertComposition = "INSERT INTO UserComposition (EmailUser, IdQuestion, IdExercises, SequenceComposition) VALUES ('%s', '%s', '%s', '%s')";
     private $select = "SELECT U.Id, U.Email, U.Name, U.Password, U.DateBirth, U.City, U.Country, U.Type, 
                         UC.IdClass, UP.IdPermission, P.IsMenu, P.Menu, P.Link,
+                        TU.IdTasks, TU.Percentagem,
                         UCO.IdQuestion as IdQuestionUser, UCO.IdExercises as IdExercisesUser, UCO.SequenceComposition as SequenceCompositionUser
                         FROM Users as U left join UsersClass as UC ON U.Email = UC.EmailUsers 
                         left join UsersPermission as UP ON U.Email = UP.EmailUsers 
-                        left join UserComposition as UCO ON U.Email = U.Email
+                        left join UserComposition as UCO ON UCO.EmailUser = U.Email
+                        left join TasksUsers as TU ON TU.EmailUser = U.Email
                         left join Permission as P ON P.id = UP.IdPermission WHERE %s %s";
+    private $selecTasks = "SELECT U.Id, U.Email, U.Name, U.Password, U.DateBirth, U.City, U.Country, U.Type,
+                        C.Id as IdCourse, C.Name as NameCourse, C.Description, C.DateNew, C.DateFinish, C.Information, C.Instructor,
+                        C.Password, C.CertifiedPercentage, C.MinimumTime,
+                        T.Id as IdTasks, T.WeightTask, TU.Percentagem, TU.EmailUser,
+                        EX.Id as IdExercises, EX.Name as NameExercises, Ex.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises
+                        FROM Courses as C left join CoursesAvailableClass as CAC ON C.Id = CAC.IdCourse
+                        left join Tasks as T ON C.Id = T.IdCourses
+                        left join TasksUsers as TU ON T.Id = TU.IdTasks
+                        left join Exercises as EX ON T.Id = EX.IdTasks
+                        left join Users as U ON U.Email = TU.EmailUser
+                        WHERE %s %s";
     private $update = "UPDATE Users SET Name = '%s', Password = '%s', DateBirth = '%s', City = '%s', Country = '%s' WHERE Email = '%s'";
     private $updateCompostion = "UPDATE UserComposition SET SequenceComposition = '%s' WHERE EmailUser LIKE '%s' AND IdQuestion LIKE '%s' AND IdExercises LIKE '%s'";
     private $dropUser = "DELETE FROM Users WHERE Email LIKE '%s'";
@@ -209,6 +222,72 @@ class UsersDAO extends DAO{
         return $array;
     }
     
+    public function getUserTasks(FilterUsers $filter) {
+        $objects = new ArrayObject();
+        $sql = sprintf($this->selecTasks, $filter->getWhere(), $filter->getOrder());
+        $rs = $this->runSelect($sql);
+        
+        for ($i = 0 ; $i < count($rs) ; $i++){
+            for ($i = 0 ; $i < count($rs) ; $i++){
+                $user = new Users();
+                
+                
+                $exercises = new ArrayObject();
+                
+                $classes = new ArrayObject();
+                if (isset($rs[$i]['IdClass']) && $rs[$i]['IdClass'] != null) {
+                    $classe = new Classes();
+                    $classe->setId($rs[$i]['IdClass']);
+                    
+                    $classes->append($classe);
+                }
+                
+                $user->setClasses($classes);
+                
+                
+                $permissions = new ArrayObject();
+                if (isset($rs[$i]['IdPermission'] ) && $rs[$i]['IdPermission'] != null) {
+                    $permission = new Permission();
+                    $permission->setId($rs[$i]['IdPermission']);
+                    $permission->setIsMenu($rs[$i]['IsMenu']);
+                    $permission->setMenu($rs[$i]['Menu']);
+                    $permission->setLink($rs[$i]['Link']);
+                    
+                    $permissions->append($permission);
+                }
+                
+                $user->setPermissions($permissions);
+                
+                if (isset($rs[$i]['IdExercises']) && $rs[$i]['IdExercises'] != null) {
+                    $exercise = new Exercises();
+                    $exercise->setIdExercise($rs[$i]['IdExercises']);
+                    if ($rs[$i]['IdTasks'] != null) {
+                        $exercise->setIdTask($rs[$i]['IdTasks']);
+                        $exercise->setPercentagem($rs[$i]['Percentagem']);
+                    }
+                    
+                    $questions = new ArrayObject();
+                    $exercise->setQuestions($questions);
+                    
+                    $exercises->append($exercise);
+                }
+                $user->setExercises($exercises);
+                
+                
+                $user->setId($rs[$i]['Id']);
+                $user->setEmail($rs[$i]['Email']);
+                $user->setName($rs[$i]['Name']);
+                $user->setPassword($rs[$i]['Password']);
+                $user->setDateBirth(new DateTime($rs[$i]['DateBirth']));
+                $user->setCity($rs[$i]['City']);
+                $user->setCountry($rs[$i]['Country']);
+                $user->setType($rs[$i]['Type']);
+                
+                $objects = $this->InsertObject($objects, $user);
+            }
+        }
+        return $objects;
+    }
     
     public function getObjects($filter) {
         $objects = new ArrayObject();
@@ -235,6 +314,10 @@ class UsersDAO extends DAO{
                 if ($rs[$i]['IdExercisesUser'] != null) {
                     $exercise = new Exercises();
                     $exercise->setIdExercise($rs[$i]['IdExercisesUser']);
+                    if ($rs[$i]['IdTasks'] != null) {
+                        $exercise->setIdTask($rs[$i]['IdTasks']);
+                        $exercise->setPercentagem($rs[$i]['Percentagem']);
+                    }
                     
                     $questions = new ArrayObject();
                     if ($rs[$i]['IdQuestionUser'] != null) {

@@ -40,7 +40,14 @@ class FilterUsers extends FilterSearch {
                             $this->users->getPassword(),
                             $exercise->getIdExercise());
                     }
-                }else if ($this->users->getEmail() != null && $this->users->getPassword() != null) {
+                } else if ($this->users->getExercises() != null && $this->users->getExercises()->count() > 0) {
+                    $exercise = $this->users->getExercises()->offsetGet(0);
+                    if ($exercise instanceof Exercises) {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "EX.Id LIKE '%s'",
+                            $exercise->getIdExercise());
+                    }
+                } else if ($this->users->getEmail() != null && $this->users->getPassword() != null) {
                     $pesquisa = $this->getCampo($pesquisa) . sprintf(
                         "Email LIKE '%s' AND Password LIKE '%s'",
                         $this->users->getEmail(),
