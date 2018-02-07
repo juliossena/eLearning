@@ -538,6 +538,10 @@ class CTelaCourseInstructor extends CTela{
                 }
                 
                 break;
+            case Rotas::$VIEW_ALL_TAREAS:
+                
+                
+                break;
             default:
                 break;
         }

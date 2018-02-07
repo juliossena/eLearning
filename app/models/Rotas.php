@@ -110,6 +110,7 @@ class Rotas {
 	public static $VIEW_EDIT_EXERCISES = "viewEditExercises";
 	public static $EDIT_EXERCISES = "editExercises";
 	public static $VIEW_INFO_EXERCISE = "viewInfoExercise";
+	public static $VIEW_ALL_TAREAS = "viewAllTareas";
 	
 	//Códigos SubRotas Cursos
 	public static $COD_NEW_COURSE = 30;
