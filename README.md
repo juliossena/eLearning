@@ -8,7 +8,6 @@ Código Banco de Dados:
 
 
 
-create database site;
 
 create table Users (
 	Id int not null AUTO_INCREMENT,
@@ -112,6 +111,7 @@ create table Answer (
 create table Tasks (
 	Id int not null auto_increment,
     IdCourses int not null,
+    WeightTask int not null,
     primary key (Id),
     foreign key (IdCourses) references Courses(Id)
 ) engine = innodb;
@@ -155,6 +155,7 @@ create table CoursesConfigUser (
 create table TasksUsers (
 	IdTasks int not null,
     EmailUser varchar(100) not null,
+    Percentagem float not null,
     primary key (IdTasks, EmailUser),
     foreign key (IdTasks) references Tasks(Id),
     foreign key (EmailUser) references Users(Email)
@@ -173,6 +174,67 @@ create table NewsCourses (
     foreign key (EmailUser) references Users(Email)
 ) engine = innodb;
 
+create table Exercises (
+	Id int not null auto_increment,
+    Name varchar(128) not null,
+    DateLimite timestamp,
+    Released boolean not null,
+    IdTasks int not null,
+    foreign key (IdTasks) references Tasks(Id),
+    primary key (Id)
+) engine = innodb;
+
+create table Question (
+	Id int not null auto_increment,
+    Difficulty int not null,
+    Sequence int,
+    IdExercises int not null,
+    primary key (Id),
+    foreign key (IdExercises) references Exercises(Id)
+) engine = innodb;
+
+create table CompositionQuestion (
+	IdQuestion int not null,
+    Sequence int not null,
+    Type int not null,
+    Answer boolean,
+    Text text,
+    Link varchar(256),
+    primary key (IdQuestion, Sequence),
+    foreign key (IdQuestion) references Question (Id)
+) engine = innodb;
+
+create table UserComposition (
+	EmailUser varchar(128) not null,
+    IdQuestion int not null,
+    IdExercises int not null,
+    SequenceComposition int not null,
+    primary key (EmailUser, IdQuestion, IdExercises),
+    foreign key (EmailUser) references Users (Email),
+    foreign key (IdQuestion) references Question (Id),
+    foreign key (IdExercises) references Exercises(Id)
+) engine = innodb;
+
+create table UploadTasks (
+	Id Int Not null Auto_increment,
+    IdTasks Int Not null,
+    Name Varchar (128) not null,
+    DateFinish Timestamp,
+    DaysDelay Int not null,
+    Primary Key (Id),
+    Foreign Key (IdTasks) references Tasks(Id)
+) engine = innodb;
+
+create table UploadTasksUser (
+	IdUploadTasks Int not null,
+    EmailUser varchar(100) not null,
+    DateSend Timestamp not null,
+    File Varchar(128) not null,
+    Percentagem float,
+    Primary Key (IdUploadTasks, EmailUser),
+    Foreign Key (IdUploadTasks) references UploadTasks(Id),
+    Foreign Key (EmailUser) references Users(Email)
+) engine = innodb;
 
 
 delimiter |
@@ -218,7 +280,7 @@ END;
 
 delimiter ;
 
-INSERT INTO `permission` (`Id`, `Name`, `Description`, `IsMenu`, `Menu`, `Link`) VALUES
+INSERT INTO Permission (`Id`, `Name`, `Description`, `IsMenu`, `Menu`, `Link`) VALUES
 (1, 'Instructores', 'Menú de creación de instructores', 1, 'Instructores', 'instructors'),
 (2, 'Estudiante', NULL, 1, 'Estudiante', 'students'),
 (3, 'Administradores', NULL, 1, 'Admins', 'administrators'),
