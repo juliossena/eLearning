@@ -596,7 +596,81 @@ $(function(){
 			return false;
 		});
 		
+		$("form#editUploadTasks").submit(function(){
+			$idCourse = $('input[name=idCourse]').val();
+			$nameUploadTasks = $('input[name=nameUploadTasks]').val();
+			$weightUploadTasks = $('input[name=weightUploadTasks]').val();
+			$dateLimit = $('input[name=dateLimit]').val();
+			$daysDelay = $('input[name=daysDelay]').val();
+			$idTask = $('input[name=idTask]').val();
+			$idUploadTasks = $('input[name=idUploadTasks]').val();
+			if ($nameUploadTasks == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=nameUploadTasks]').focus();
+			} else if ($weightUploadTasks == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=weightUploadTasks]').focus();
+			} else if ($dateLimit == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=dateLimit]').focus();
+			} else if ($daysDelay == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=daysDelay]').focus();
+			} else {
+				$.ajax({
+					type: 'POST',
+					url: $('input[name=rota]').val(),
+					data: {
+						"idCourse": $idCourse,
+						"nameUploadTasks": $nameUploadTasks,
+						"weightUploadTasks": $weightUploadTasks,
+						"dateLimit": $dateLimit,
+						"daysDelay": $daysDelay,
+						"idTask": $idTask,
+						"idUploadTasks": $idUploadTasks
+					}
+				}).done(function(e){
+					$("#result").html(e);
+				});
+			}
+			return false;
+		});
 		
+		$("form#createUploadTask").submit(function(){
+			$idCourse = $('input[name=idCourse]').val();
+			$nameUploadTasks = $('input[name=nameUploadTasks]').val();
+			$weightUploadTasks = $('input[name=weightUploadTasks]').val();
+			$dateLimit = $('input[name=dateLimit]').val();
+			$daysDelay = $('input[name=daysDelay]').val();
+			if ($nameUploadTasks == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=nameUploadTasks]').focus();
+			} else if ($weightUploadTasks == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=weightUploadTasks]').focus();
+			} else if ($dateLimit == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=dateLimit]').focus();
+			} else if ($daysDelay == "") {
+				alert ("Rellene todos los campos obligatorio");
+				$('input[name=daysDelay]').focus();
+			} else {
+				$.ajax({
+					type: 'POST',
+					url: $('input[name=rota]').val(),
+					data: {
+						"idCourse": $idCourse,
+						"nameUploadTasks": $nameUploadTasks,
+						"weightUploadTasks": $weightUploadTasks,
+						"dateLimit": $dateLimit,
+						"daysDelay": $daysDelay
+					}
+				}).done(function(e){
+					$("#result").html(e);
+				});
+			}
+			return false;
+		});
 		
 		$("form#createExercise").submit(function(){
 			$idCourse = $('input[name=idCourse]').val();

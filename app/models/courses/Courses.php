@@ -19,6 +19,7 @@ class Courses {
     private $classes;
     private $news;
     private $exercises;
+    private $uploadTasks;
     
     public function getId() {
              return $this->id;
@@ -162,6 +163,14 @@ class Courses {
     
     public function setExercises(ArrayObject $exercises) {
         $this->exercises = $exercises;
+    }
+    
+    public function getUploadTasks() {
+        return $this->uploadTasks;
+    }
+    
+    public function setUploadTasks(ArrayObject $uploadTasks) {
+        $this->uploadTasks = $uploadTasks;
     }
     
     

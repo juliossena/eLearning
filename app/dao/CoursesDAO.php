@@ -5,6 +5,7 @@ $requiresUH[] = 'app/models/tasks/CompositionQuestion.php';
 $requiresUH[] = 'app/models/tasks/Exercises.php';
 $requiresUH[] = 'app/models/tasks/Question.php';
 $requiresUH[] = 'app/models/tasks/Tasks.php';
+$requiresUH[] = 'app/models/tasks/UploadTasks.php';
 $requiresUH[] = 'app/dao/DAO.php';
 
 for ($i = 0 ; $i < count($requiresUH) ; $i ++) {
@@ -25,6 +26,7 @@ class CoursesDAO extends DAO{
     private $insertCourseUser = "INSERT INTO CoursesAvailableUser (IdCourse, EmailUser) VALUES %s";
     private $insertCourseFile = "INSERT INTO Files (Name, Link, Thumbnail, IdCourses) VALUES ('%s', '%s', '%s', '%s')";
     private $insertTasks = "INSERT INTO Tasks (Id, IdCourses, WeightTask) VALUES ('%s', '%s', '%s')";
+    private $insertUploadTasks = "INSERT INTO UploadTasks (IdTasks, Name, DateFinish, DaysDelay) VALUES ('%s', '%s', '%s', '%s')";
     private $insertQuestion = "INSERT INTO Question (Id, Difficulty, Sequence, IdExercises) VALUES ('%s', '%s', '%s', '%s')";
     private $insertCompositionQuestion = "INSERT INTO CompositionQuestion (IdQuestion, Sequence, Type, Answer, Text, Link) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
     private $insertExercises = "INSERT INTO Exercises (Name, DateLimite, Released, IdTasks) VALUES ('%s', '%s', '%s', '%s')";
@@ -60,6 +62,7 @@ class CoursesDAO extends DAO{
                         CRU.TimeElapse, F.Id as IdForum, F.UserCreate as UserCreateForum, F.DateCreate as DateCreateForum, F.Title as TitleForum, UF.Name as NameUserForum,
                         A.Id as IdAnswer, A.UserCreate as UserCreateAnswer, A.DateCreate as DateCreateAnswer, A.Answer, UA.Name as NameUserAnswer,
                         T.Id as IdTasks, T.WeightTask, TU.Percentagem,
+                        UT.Id as IdUploadTask, UT.Name as NameUploadTask, UT.DateFinish as DateFinishUploadTask, UT.DaysDelay as DaysDelayUploadTask,
                         FI.Id as IdFile, FI.Name as NameFile, FI.Thumbnail, FI.Link as LinkFile,
                         EX.Id as IdExercises, EX.Name as NameExercises, Ex.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises,
                         QU.Id as IdQuestion, QU.Difficulty as DifficultyQuestion, QU.Sequence as SequenceQuestion, 
@@ -81,12 +84,14 @@ class CoursesDAO extends DAO{
                         left join CompositionQuestion as CQ ON CQ.IdQuestion = QU.Id
                         left join Files as FI ON C.Id = FI.IdCourses 
                         left join UsersClass as UC ON UC.IdClass = CAC.IdClass
+                        left join UploadTasks as UT ON UT.IdTasks = T.Id
                         left join NewsCourses as NC ON NC.IdCourse = C.Id WHERE %s %s";
     
     private $update = "UPDATE Courses SET Name='%s', Description='%s', DateNew='%s', DateFinish='%s', Information='%s', Instructor='%s', Password='%s', CertifiedPercentage='%s', MinimumTime='%s' WHERE Id LIKE '%s'";
     private $updateTimeCourse = "UPDATE CoursesRegisteredUser SET TimeElapse = '%s' WHERE IdCourse Like '%s' AND EmailUser Like '%s'";
     private $updateExercise = "UPDATE Exercises SET Name = '%s', DateLimite = '%s', Released = '%s' WHERE Id LIKE '%s' AND IdTasks LIKE '%s'";
     private $updateTasks = "UPDATE Tasks SET WeightTask = '%s' Where Id LIKE '%s'";
+    private $updateUploadTasks = "UPDATE UploadTasks SET Name = '%s', DateFinish = '%s', DaysDelay = '%s' WHERE IdTasks LIKE '%s' AND ID LIKE '%s'";
     private $dropCourses = "DELETE FROM Courses WHERE Id LIKE '%s'";
     private $dropCoursesAvailableClass = "DELETE FROM CoursesAvailableClass WHERE IdCourse LIKE '%s'";
     private $dropCoursesAvailableUser = "DELETE FROM CoursesAvailableUser WHERE IdCourse LIKE '%s'";
@@ -136,6 +141,17 @@ class CoursesDAO extends DAO{
             }
         } else {
             throw new ObjectException("it is necessary that the object be of type course");
+        }
+    }
+    
+    public function insertUploadTasks (Courses $course) {
+        $uploadTask = $course->getUploadTasks()->offsetGet(0);
+        if ($uploadTask instanceof UploadTasks) {
+            $sql = sprintf($this->insertTasks, $uploadTask->getIdTask(), $course->getId(), $uploadTask->getWeightTask());
+            if ($this->runQuery($sql)) {
+                $sql = sprintf($this->insertUploadTasks, $uploadTask->getIdTask(), $uploadTask->getName(), $uploadTask->getDateFinish()->format("Y-m-d H:i:s"), $uploadTask->getDaysDelay());
+                return $this->runQuery($sql);
+            }
         }
     }
     
@@ -464,6 +480,19 @@ class CoursesDAO extends DAO{
         return $array;
     }
     
+    protected function insertUploadTask (ArrayObject $array, UploadTasks $uploadTasks) {
+        for ($i = 0 ; $i < $array->count() ; $i++) {
+            $newUploadTasks = $array->offsetGet($i);
+            if ($newUploadTasks instanceof UploadTasks) {
+                if ($newUploadTasks->getIdTask() == $uploadTasks->getIdTask()) {
+                    return $array;
+                }
+            }
+        }
+        $array->append($uploadTasks);
+        return $array;
+    }
+    
     protected function insertQuestion (ArrayObject $array, Question $question) {
         for ($i = 0 ; $i < $array->count() ; $i++) {
             $newQuestion = $array->offsetGet($i);
@@ -526,6 +555,9 @@ class CoursesDAO extends DAO{
                     if ($courses->getExercises() != null && $courses->getExercises()->count() > 0) {
                         $newCourse->setExercises($this->insertExercises($newCourse->getExercises(), $courses->getExercises()->offsetGet(0)));
                     }
+                    if ($courses->getUploadTasks() != null && $courses->getUploadTasks()->count() > 0) {
+                        $newCourse->setExercises($this->insertUploadTask($newCourse->getUploadTasks(), $courses->getUploadTasks()->offsetGet(0)));
+                    }
                     //$newCourse->setTasks($tasks);
                     
                     $array->offsetSet($i, $newCourse);
@@ -543,6 +575,19 @@ class CoursesDAO extends DAO{
             $sql = sprintf($this->updateExercise, $exercise->getName(), $exercise->getDateLimit()->format("Y-m-d H:i:s"), $exercise->getReleased(), $exercise->getIdExercise(), $exercise->getIdTask());
             return $this->runQuery($sql);
         }
+    }
+    
+    public function updateUploadTasks (Courses $course) {
+        $uploadTasks = $course->getUploadTasks()->offsetGet(0);
+        if ($uploadTasks instanceof UploadTasks) {
+            $sql = sprintf($this->updateTasks, $uploadTasks->getWeightTask(), $uploadTasks->getIdTask());
+            if ($this->runQuery($sql)) {
+                $sql = sprintf($this->updateUploadTasks, $uploadTasks->getName(), $uploadTasks->getDateFinish()->format("Y-m-d H:i:s"), $uploadTasks->getDaysDelay(), $uploadTasks->getIdTask(), $uploadTasks->getIdUploadTasks());
+                return $this->runQuery($sql);
+            }
+        }
+        
+        
     }
     
     public function updateTimeCourse(Courses $course, Users $user) {
@@ -921,6 +966,19 @@ class CoursesDAO extends DAO{
                 }
                 
                 $course->setExercises($exercises);
+                
+                $uploadTasks = new ArrayObject();
+                if ($rs[$i]['IdUploadTask'] != null) {
+                    $uploadTask = new UploadTasks();
+                    $uploadTask->setIdTask($rs[$i]['IdTasks']);
+                    $uploadTask->setIdUploadTasks($rs[$i]['IdUploadTask']);
+                    $uploadTask->setDateFinish(DateTime::createFromFormat("Y-m-d H:i:s", $rs[$i]['DateFinishUploadTask']));
+                    $uploadTask->setDaysDelay($rs[$i]['DaysDelayUploadTask']);
+                    $uploadTask->setName($rs[$i]['NameUploadTask']);
+                    $uploadTask->setWeightTask($rs[$i]['WeightTask']);
+                    $uploadTasks->append($uploadTask);
+                }
+                $course->setUploadTasks($uploadTasks);
                 
                 $objects = $this->InsertObject($objects, $course);
                 

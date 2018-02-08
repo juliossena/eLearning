@@ -36,9 +36,17 @@ class FilterCourses extends FilterSearch {
             $this->courses->getInstructor() != null ||
             $this->courses->getForuns() != null ||
             $this->courses->getExercises() != null ||
-            $this->courses->getExercises() != null) {
+            $this->courses->getExercises() != null ||
+            $this->courses->getUploadTasks() != null) {
             
-            if ($this->courses->getExercises() != null && $this->courses->getExercises()->count() > 0) {
+            if ($this->courses->getUploadTasks() != null && $this->courses->getUploadTasks()->count() > 0) {
+                $uploadTasks = $this->courses->getUploadTasks()->offsetGet(0);
+                if ($uploadTasks instanceof UploadTasks) {
+                    $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                        "UT.Id LIKE '%s'",
+                        $uploadTasks->getIdUploadTasks());
+                }
+            } else if ($this->courses->getExercises() != null && $this->courses->getExercises()->count() > 0) {
                 $exercise = $this->courses->getExercises()->offsetGet(0);
                 if ($exercise instanceof Exercises) {
                     if ($exercise->getReleased() != null) {

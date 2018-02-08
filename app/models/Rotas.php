@@ -111,6 +111,12 @@ class Rotas {
 	public static $EDIT_EXERCISES = "editExercises";
 	public static $VIEW_INFO_EXERCISE = "viewInfoExercise";
 	public static $VIEW_ALL_TAREAS = "viewAllTareas";
+	public static $VIEW_CREATE_TAREA = "viewCreateTarea";
+	public static $CREATE_TAREA = "createTarea";
+	public static $VIEW_EDIT_TAREA_INSTRUCTOR = "viewEditTareaInstructor";
+	public static $VIEW_INFO_TAREA_INSTRUCTOR = "viewInfoTareaInstructor";
+	public static $EDIT_TAREA_INSTRUCTOR = "editTareaInstructor";
+	public static $OPEN_TAREA_INSTRUCTOR = "openTareaInstructor";
 	
 	//Códigos SubRotas Cursos
 	public static $COD_NEW_COURSE = 30;

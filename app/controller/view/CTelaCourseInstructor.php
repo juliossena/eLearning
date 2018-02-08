@@ -4,7 +4,7 @@ $requiresCTCI[] = 'app/controller/view/CTela.php';
 $requiresCTCI[] = 'app/view/courses/VCourses.php';
 $requiresCTCI[] = 'app/models/courses/Forum.php';
 $requiresCTCI[] = 'app/models/courses/Answer.php';
-
+$requiresCTCI[] = 'app/models/tasks/UploadTasks.php';
 
 for ($i = 0 ; $i < count($requiresCTCI) ; $i ++) {
     while (!file_exists($requiresCTCI[$i])) {
@@ -539,7 +539,114 @@ class CTelaCourseInstructor extends CTela{
                 
                 break;
             case Rotas::$VIEW_ALL_TAREAS:
+                $idCourse = $_REQUEST['idCourse'];
+                $course = new Courses();
+                $course->setId($_REQUEST['idCourse']);
                 
+                $filterCourse = new FilterCourses($course);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewAllUploadTasks($course);
+                }
+                
+                break;
+            case Rotas::$VIEW_CREATE_TAREA:
+                $idCourse = $_REQUEST['idCourse'];
+                $course = new Courses();
+                $course->setId($_REQUEST['idCourse']);
+                
+                $filterCourse = new FilterCourses($course);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewCreateTarea($course);
+                }
+                break;
+            case Rotas::$CREATE_TAREA:
+                $course = new Courses();
+                $course->setId($_REQUEST['idCourse']);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $uploadTasks = new ArrayObject();
+                
+                $uploadTask = new UploadTasks();
+                $uploadTask->setDateFinish(DateTime::createFromFormat("d/m/Y H:i:s", $_REQUEST['dateLimit']));
+                $uploadTask->setDaysDelay($_REQUEST['daysDelay']);
+                $uploadTask->setIdTask($courseDAO->getNextAutoIncrementTasks());
+                $uploadTask->setName($_REQUEST['nameUploadTasks']);
+                $uploadTask->setWeightTask($_REQUEST['weightUploadTasks']);
+                
+                $uploadTasks->append($uploadTask);
+                
+                $course->setUploadTasks($uploadTasks);
+                
+                if ($courseDAO->insertUploadTasks($course)) {
+                    $this->screen->setInsertSuccess();
+                } else {
+                    $this->screen->setInsertFail();
+                }
+                
+                break;
+                
+            case Rotas::$VIEW_EDIT_TAREA_INSTRUCTOR:
+                $course = new Courses();
+                
+                $uploadTasks = new ArrayObject();
+                
+                $uploadTask = new UploadTasks();
+                $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                $uploadTasks->append($uploadTask);
+                
+                $course->setUploadTasks($uploadTasks);
+                
+                $filterCourse = new FilterCourses($course);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewEditTarea($course);
+                }
+                
+                
+                break;
+            case Rotas::$EDIT_TAREA_INSTRUCTOR:
+                $course = new Courses();
+                $courseDAO = new CoursesDAO();
+                
+                $uploadTasks = new ArrayObject();
+                
+                $uploadTask = new UploadTasks();
+                $uploadTask->setDateFinish(DateTime::createFromFormat("d/m/Y H:i:s", $_REQUEST['dateLimit']));
+                $uploadTask->setDaysDelay($_REQUEST['daysDelay']);
+                $uploadTask->setIdTask($_REQUEST['idTask']);
+                $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                $uploadTask->setName($_REQUEST['nameUploadTasks']);
+                $uploadTask->setWeightTask($_REQUEST['weightUploadTasks']);
+                
+                $uploadTasks->append($uploadTask);
+                
+                $course->setUploadTasks($uploadTasks);
+                
+                if ($courseDAO->updateUploadTasks($course)) {
+                    $this->screen->setInsertSuccess();
+                } else {
+                    $this->screen->setInsertFail();
+                }
+                break;
+            case Rotas::$VIEW_INFO_TAREA_INSTRUCTOR:
+                
+                break;
+            case Rotas::$OPEN_TAREA_INSTRUCTOR:
                 
                 break;
             default:

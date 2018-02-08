@@ -10,7 +10,7 @@ class Connection {
 	private $usuario = "tinnitusperu";
     private $senha = "S1stem@M";
     private $host = "198.57.158.150";
-    private $db = "tinnitus_web17db";
+    private $db = "tinnitus_eLearning";
 	*/
 
 	private function connect(){

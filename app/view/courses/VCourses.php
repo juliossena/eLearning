@@ -43,6 +43,105 @@ class VCourses implements View {
         $this->content = $this->newQuestion();
     }
     
+    public function setViewEditTarea (Courses $course) {
+        $return = '';
+        $uploadTasks = $course->getUploadTasks()->offsetGet(0);
+        if ($uploadTasks instanceof UploadTasks) {
+            $return .= '<script type="text/javascript" src="js/script.js"></script>
+                    <div id="result"></div>
+                    <form id="editUploadTasks">
+                        <input type="hidden" value="index.php?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$EDIT_TAREA_INSTRUCTOR.'" name="rota">
+                        <input type="hidden" value="'.$uploadTasks->getIdUploadTasks().'" name="idUploadTasks">
+                        <input type="hidden" value="'.$uploadTasks->getIdTask().'" name="idTask">
+                        <table class="form">
+                            <tr>
+                                <td class="left">Título Tarea*
+                                <td class="right"><input name="nameUploadTasks" value="'.$uploadTasks->getName().'">
+                            <tr>
+                                <td class="left">Peso Ejercicio*
+                                <td class="right"><input name="weightUploadTasks" value="'.$uploadTasks->getWeightTask().'">
+                            <tr>
+                                <td class="left">Fecha Limite*
+                                <td class="right"><input name="dateLimit" value="'.$uploadTasks->getDateFinish()->format("d/m/Y H:i:s").'">
+                            <tr>
+                                <td class="left">Días de retraso*
+                                <td class="right"><input name="daysDelay" value="'.$uploadTasks->getDaysDelay().'">
+                            <tr>
+                                <td colspan="2"><button type="submit">Guardar</button>
+                        </table>
+                    </form>';
+        }
+        
+        $this->content = $return;
+    }
+    
+    public function setViewCreateTarea (Courses $course) {
+        $return = '';
+        $return .= '<script type="text/javascript" src="js/script.js"></script>
+                    <div id="result"></div>
+                    <form id="createUploadTask">
+                        <input type="hidden" value="index.php?site='.Rotas::$COURSES_INSTRUCTOR.'&subSite='.Rotas::$CREATE_TAREA.'" name="rota">
+                        <input type="hidden" value="'.$course->getId().'" name="idCourse">
+                        <table class="form">
+                            <tr>
+                                <td class="left">Título Tarea*
+                                <td class="right"><input name="nameUploadTasks">
+                            <tr>
+                                <td class="left">Peso Ejercicio*
+                                <td class="right"><input name="weightUploadTasks">
+                            <tr>
+                                <td class="left">Fecha Limite*
+                                <td class="right"><input name="dateLimit">
+                            <tr>
+                                <td class="left">Días de retraso*
+                                <td class="right"><input name="daysDelay" value="0">
+                            <tr>
+                                <td colspan="2"><button type="submit">Create</button>
+                        </table>
+                    </form>';
+        
+        $this->content = $return;
+    }
+    
+    public function setViewAllUploadTasks (Courses $course) {
+        $return = '';
+        $return .= '
+            <button onclick="carregarPaginaAtivarCheck('."'#dadosNovaPagina', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CREATE_TAREA."&idCourse=".$course->getId()."'".')">Crear Nueva Tarea</button>
+            <script type="text/javascript" src="js/jquery.quick.search.js"></script>
+            <input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Tarea" />
+                <table class="lista-clientes" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Nombre
+                            <th>Fecha Data
+                            <th colspan="3" class="actions">
+                        </tr>
+                    </thead>
+        ';
+        
+        for ($i = 0 ; $i < $course->getUploadTasks()->count() ; $i++) {
+            $uploadTask = $course->getUploadTasks()->offsetGet($i);
+            if ($uploadTask instanceof UploadTasks) {
+                $return .= '
+                    <tr>
+                        <td>'.$uploadTask->getName().'
+                        <td>'.$uploadTask->getDateFinish()->format("d/m/Y H:i:s").'
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_EDIT_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."')".'" src="imagens/editar.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_INFO_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."')".'" src="imagens/view.png">
+                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."'".')" src="imagens/enter.png">
+                    
+                ';
+                    
+                    
+            }
+        }
+        
+        
+        $return .= '</table>';
+        
+        $this->content = $return;
+    }
+    
     public function setViewInfoExrcise (ArrayObject $users, Exercises $exercise) {
         $return = '';
         $return .= '<h1 class="line">Información</h1>
@@ -1408,7 +1507,7 @@ class VCourses implements View {
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FILES_COURSE."&idCourse=".$course->getId()."'".')">Archivos</a></li>
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_ALL_EXERCISES."&idCourse=".$course->getId()."'".')">Ejercicios</a></li>
-                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Tareas</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_ALL_TAREAS."&idCourse=".$course->getId()."'".')">Tareas</a></li>
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Resultados</a></li>
                         </ul>
                     </div>

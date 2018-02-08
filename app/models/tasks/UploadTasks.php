@@ -37,7 +37,7 @@ class UploadTasks extends Tasks{
         return $this->dateFinish;
     }
     
-    public function setDateFinish($dateFinish) {
+    public function setDateFinish(DateTime $dateFinish) {
         $this->dateFinish = $dateFinish;
     }
     
@@ -53,7 +53,7 @@ class UploadTasks extends Tasks{
         return $this->dateSend;
     }
     
-    public function setDateSend($dateSend) {
+    public function setDateSend(DateTime $dateSend) {
         $this->dateSend = $dateSend;
     }
     
