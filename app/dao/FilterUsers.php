@@ -31,7 +31,23 @@ class FilterUsers extends FilterSearch {
         
         if ($this->users != null) {
             if ($this->users instanceof Users) {
-                if ($this->users->getEmail() != null && $this->users->getExercises() != null && $this->users->getExercises()->count() > 0) {
+                if ($this->users->getEmail() == null && $this->users->getUploadTasks() != null && $this->users->getUploadTasks()->count() > 0) {
+                    $uploadTasks = $this->users->getUploadTasks()->offsetGet(0);
+                    if ($uploadTasks instanceof UploadTasks) {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "UTU.IdUploadTasks LIKE '%s'",
+                            $uploadTasks->getIdUploadTasks());
+                    }
+                }else if ($this->users->getEmail() != null && $this->users->getUploadTasks() != null && $this->users->getUploadTasks()->count() > 0) {
+                    $uploadTasks = $this->users->getUploadTasks()->offsetGet(0);
+                    if ($uploadTasks instanceof UploadTasks) {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "Email LIKE '%s' AND U.Password LIKE '%s' AND UTU.IdUploadTasks LIKE '%s'",
+                            $this->users->getEmail(),
+                            $this->users->getPassword(),
+                            $uploadTasks->getIdUploadTasks());
+                    }
+                } else if ($this->users->getEmail() != null && $this->users->getExercises() != null && $this->users->getExercises()->count() > 0) {
                     $exercise = $this->users->getExercises()->offsetGet(0);
                     if ($exercise instanceof Exercises) {
                         $pesquisa = $this->getCampo($pesquisa) . sprintf(

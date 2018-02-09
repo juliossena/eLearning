@@ -15,7 +15,8 @@ for ($i = 0 ; $i < count($requires) ; $i ++) {
 class CabecalhoPadrao extends Cabecalho {
 	public function getCabecalho() {
 		return '
-                	<title>CERTEI!!!</title>
+                	<title>ATSA</title>
+                    <link rel="shortcut icon" href="imagens/favicon.png" />	
                     <link rel="stylesheet" href="js/bootstrap.min.css">
                 	<script type="text/javascript" src="js/jquery-3.1.1.min.js"></script>
                 	<script type="text/javascript" src="js/script.js"></script>

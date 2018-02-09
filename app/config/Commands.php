@@ -1,6 +1,10 @@
 <?php
 class Commands {
     
+    public static function subtractTime (DateTime $hora1, DateTime $hora2) {
+        $diff = $hora1->diff($hora2);
+        return $diff->format('%d Dias') . $diff->format(' %h Horas') . $diff->format(' %i Minutes');
+    }
     
     public static function limitCharacters ($string, $lenght = 128) {
         if (strlen($string) > $lenght) {
@@ -507,9 +511,14 @@ class Commands {
 	}
 	
 	//Download de arquivo
-	public static function downloadArquivo($localArquivo, $nomeArquivo, $type) {
+	public static function downloadArquivo($localArquivo, $nomeArquivo, $type, $newName = '') {
 	    
-	    $path = '../' . $localArquivo . $nomeArquivo.'';
+	    if ($nomeArquivo == '') {
+	        $nomeArquivo = $newName;
+	        $path = $localArquivo;
+	    } else {
+	        $path = '../' . $localArquivo . $nomeArquivo.'';
+	    }
 		$fp = fopen($path, 'r');
 		$buffer = fread($fp, filesize($path));
 		fclose($fp);

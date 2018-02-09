@@ -14,6 +14,7 @@ class Users {
     private $courses;
     private $timeElapseCourse;
     private $exercises;
+    private $uploadTasks;
     
     public function getId() {
              return $this->id;
@@ -132,6 +133,16 @@ class Users {
     public function setExercises(ArrayObject $exercises) {
         $this->exercises = $exercises;
     }
+    
+    public function getUploadTasks() {
+        return $this->uploadTasks;
+    }
+    
+    public function setUploadTasks(ArrayObject $uploadTasks) {
+        $this->uploadTasks = $uploadTasks;
+    }
+    
+    
     
     public function possuiPermissao($codPermissao) {
         for ($i = 0 ; $i < $this->permissions->count() ; $i++) {

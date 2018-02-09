@@ -592,6 +592,126 @@ class CTelaCourseStudent extends CTela{
                 }
                 
                 break;
+            case Rotas::$VIEW_ALL_UPLOAD_TASKS_STUDENT:
+                $idCourse = $_REQUEST['idCourse'];
+                $course = new Courses();
+                $course->setId($_REQUEST['idCourse']);
+                
+                $filterCourse = new FilterCourses($course);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                if ($course instanceof Courses) {
+                    $this->screen->setViewAllUploadTasksStudent($course);
+                }
+                break;
+            case Rotas::$OPEN_UPLOAD_TASKS_STUDENT:
+                $course = new Courses();
+                
+                $uploadTasks = new ArrayObject();
+                
+                $uploadTask = new UploadTasks();
+                $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                $uploadTasks->append($uploadTask);
+                
+                $course->setUploadTasks($uploadTasks);
+                
+                $filterCourse = new FilterCourses($course);
+                
+                $courseDAO = new CoursesDAO();
+                
+                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                
+                $this->user->setUploadTasks($uploadTasks);
+                
+                $filterUser = new FilterUsers($this->user);
+                
+                $userDAO = new UsersDAO();
+                
+                $userUploadTasks = $userDAO->getUserTasks($filterUser);
+                
+                if ($userUploadTasks->count() > 0) {
+                    $userUploadTasks = $userUploadTasks->offsetGet(0);
+                    $userUploadTasks = $userUploadTasks->getUploadTasks()->offsetGet(0);
+                }
+                
+                
+                if ($course instanceof Courses) {
+                    $uploadTask = $course->getUploadTasks()->offsetGet(0);
+                    if ($uploadTask instanceof UploadTasks && $userUploadTasks instanceof UploadTasks) {
+                        $uploadTask->setDateSend($userUploadTasks->getDateSend());
+                        $uploadTask->setFile($userUploadTasks->getFile());
+                        $uploadTask->setPercentagem($userUploadTasks->getPercentagem());
+                    }
+                    
+                    $this->screen->setOpenUploadTasks($course, $uploadTask);
+                }
+                break;
+            case Rotas::$UPLOAD_FILE_UPLOAD_TASKS:
+                $uploaddir = '../dados/uploadTasks_' . $_REQUEST['idUploadTasks'] . '/';
+                
+                if (!file_exists ($uploaddir)) {
+                    $pasta = mkdir($uploaddir , 0777);
+                    chown($pasta,'root');
+                }
+                
+                $nameFile = explode(".", $_FILES['fileUploadTasks']['name']);
+                $extensao = strtolower($nameFile[count($nameFile) -1]);
+                
+                $file = hash("sha512", date('l jS \of F Y h:i:s A') . $nameFile[0]) . '.' . $extensao;
+                $uploadfile = $uploaddir . $file;
+                if (move_uploaded_file($_FILES['fileUploadTasks']['tmp_name'], $uploadfile)){
+                    
+                    $files = new Files();
+                    $files->setLocation($uploaddir . $file);
+                    $files->setName($_FILES['fileUploadTasks']['name']);
+                    
+                    $uploadTasks = new ArrayObject();
+                    
+                    $uploadTask = new UploadTasks();
+                    $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                    $uploadTask->setDateSend(DateTime::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:s")));
+                    $uploadTask->setFile($files);
+                    
+                    $uploadTasks->append($uploadTask);
+                    
+                    $this->user->setUploadTasks($uploadTasks);
+                    
+                    $userDAO = new UsersDAO();
+                    
+                    if ($userDAO->insertUploadTasks($this->user)) {
+                        echo '
+                            <script>
+                                carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_UPLOAD_TASKS_STUDENT."&idUploadTasks=".$_REQUEST['rotaActual']."'".')
+                            </script>
+                        ';
+                    }
+                } 
+                break;
+            case Rotas::$DOWNLOAD_FILE_UPLOAD_TASKS:
+                $uploadTasks = new ArrayObject();
+                $uploadTask = new UploadTasks();
+                $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                $uploadTasks->append($uploadTask);
+                
+                $this->user->setUploadTasks($uploadTasks);
+                
+                $userDAO = new UsersDAO();
+                
+                $filterUser = new FilterUsers($this->user);
+                
+                $userUploadTasks = $userDAO->getUserTasks($filterUser)->offsetGet(0);
+                
+                if ($userUploadTasks instanceof Users) {
+                    $uploadTask = $userUploadTasks->getUploadTasks()->offsetGet(0);
+                    if ($uploadTask instanceof UploadTasks) {
+                        Commands::downloadArquivo($uploadTask->getFile()->getLocation(), '', $uploadTask->getFile()->getType(), $uploadTask->getFile()->getName());
+                    }
+                }
+                
+                break;
             default:
                 break;
         }

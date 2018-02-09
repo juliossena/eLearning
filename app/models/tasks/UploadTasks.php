@@ -61,7 +61,7 @@ class UploadTasks extends Tasks{
         return $this->file;
     }
     
-    public function setFile($file) {
+    public function setFile(Files $file) {
         $this->file = $file;
     }
     

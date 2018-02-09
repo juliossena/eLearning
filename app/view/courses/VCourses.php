@@ -43,6 +43,123 @@ class VCourses implements View {
         $this->content = $this->newQuestion();
     }
     
+    public function setOpenUploadTasksInstructor (ArrayObject $arrayUsers) {
+        $return = '';
+        $return .= '<script type="text/javascript" src="js/script.js"></script>
+                    <input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Estudiente" />
+                    <table class="lista-clientes" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Nombre
+                                <th>Arquivo
+                                <th>Fecha de entrega
+                                <th>Nota
+                        </thead>
+                    ';
+        for ($i = 0 ; $i < $arrayUsers->count() ; $i++) {
+            $user = $arrayUsers->offsetGet($i);
+            if ($user instanceof Users) {
+                $uploadTasks = $user->getUploadTasks()->offsetGet(0);
+                if ($uploadTasks instanceof UploadTasks) {
+                    $return .= '<tr>
+                                    <td>' . $user->getName() . '
+                                    <td><div class="downloadFiles">
+                                            <a target="_blank" href="?site=' . Rotas::$COURSES_INSTRUCTOR . '&subSite=' . Rotas::$DOWNLOAD_FILE_UPLOAD_TASKS . '&idUploadTasks=' . $uploadTasks->getIdUploadTasks() . '"><div class="file"><img src="'.$uploadTasks->getFile()->getImgIcone().'"><p style="width: 100%;">'.$uploadTasks->getFile()->getName().'</p></div></a>
+                                        </div>
+                                    <td>' . $uploadTasks->getDateSend()->format("d/m/Y H:i:s") . '
+                                    <td><form id="changeNotaUploadTasks">
+                                            <input type="hidden" name="idUploadTasks" value="' . $uploadTasks->getIdUploadTasks() . '">
+                                            <input type="hidden" name="emailUser" value="' . $user->getEmail() . '">
+                                            <input type="hidden" name="rota" value="?site=' . Rotas::$COURSES_INSTRUCTOR . '&subSite=' . Rotas::$CHANGE_NOTA_UPLOAD_TASTKS . '">
+                                            <input name="notaUploadTasks" maxlength="4" value="' . ($uploadTasks->getPercentagem() * 100) . '" style="width: 60px; text-align: center;">%
+                                        </form>
+                        ';
+                }
+            }
+        }
+        
+        $return .= '</table>';
+        
+        $this->content = $return;
+    }
+    
+    public function statusSend (UploadTasks $uploadTasks) {
+        if ($uploadTasks->getDateSend() != null) {
+            return 'Enviado para la evaluación';
+        } else {
+            return 'Ningún intento';
+        }
+    }
+    
+    public function evaluationStatus (UploadTasks $uploadTasks) {
+        if ($uploadTasks->getPercentagem() != null) {
+            return number_format(($uploadTasks->getPercentagem() * 100), 2, ',', ' ') . '%';
+        } else {
+            return 'No hay notas';
+        }
+    }
+    
+    public function fileDownload (UploadTasks $uploadTasks) {
+        if ($uploadTasks->getFile() != null) {
+            return '
+            <div class="downloadFiles">
+                <a target="_blank" href="?site=' . Rotas::$COURSES_STUDENTS . '&subSite=' . Rotas::$DOWNLOAD_FILE_UPLOAD_TASKS . '&idUploadTasks=' . $uploadTasks->getIdUploadTasks() . '"><div class="file"><img src="'.$uploadTasks->getFile()->getImgIcone().'"><p style="width: 100%;">'.$uploadTasks->getFile()->getName().'</p></div></a>
+            </div>';
+        } else {
+            return '-';
+        }
+    }
+    
+    public function timeElapse(UploadTasks $uploadTasks) {
+        $timeNow = DateTime::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:s"));
+        if ($timeNow > $uploadTasks->getDateFinish()) {
+            return 'La tarea está retrasada hace: ' . Commands::subtractTime($timeNow, $uploadTasks->getDateFinish());
+        } else {
+            return Commands::subtractTime($uploadTasks->getDateFinish(), $timeNow);
+        }
+    }
+    
+    public function setOpenUploadTasks (Courses $course, UploadTasks $uploadTasks) {
+        $return = '';
+        if ($uploadTasks instanceof UploadTasks) {
+            $return .= '
+            <script type="text/javascript" src="js/script.js"></script>
+            <form class="formImg" id="sendUploadTask" enctype="multipart/form-data">
+                <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_STUDENTS.'&subSite='.Rotas::$UPLOAD_FILE_UPLOAD_TASKS.'">
+                <input name="fileUploadTasks" type="file" id="fileUploadTasks">
+                <input name="idUploadTasks" type="hidden" value="' . $uploadTasks->getIdUploadTasks() . '">
+                <input type="hidden" name="rotaActual" value="?site='.Rotas::$COURSES_STUDENTS.'&subSite='.Rotas::$OPEN_UPLOAD_TASKS_STUDENT.'&idUploadTasks='.$uploadTasks->getIdUploadTasks().'">
+            </form>
+            <table class="uploadTasks">
+                <tr>
+                    <td>Estado de envío
+                    <td>'.$this->statusSend($uploadTasks).'
+                <tr>
+                    <td>Estado de la evaluación
+                    <td>'.$this->evaluationStatus($uploadTasks).'
+                <tr>
+                    <td>Fecha de la entrega
+                    <td>' . $uploadTasks->getDateFinish()->format("d/m/Y H:i:s") . '
+                <tr>
+                    <td>Tiempo restante
+                    <td>' . $this->timeElapse($uploadTasks) . '
+                <tr>
+                    <td>Envío de archivos
+                    <td>' . $this->fileDownload($uploadTasks) . '
+                <div id="result"></div>
+            </table>
+            
+            ';
+            $timeNow = DateTime::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:s"));
+            if ($timeNow < ($uploadTasks->getDateFinish()->add(new DateInterval('P' . $uploadTasks->getDaysDelay() . 'D')))) {
+                $return .= '<label for="fileUploadTasks" class="btnFile">Añadir Archivo</label>';
+            }
+            
+            
+        }
+        $this->content = $return;
+    }
+    
     public function setViewEditTarea (Courses $course) {
         $return = '';
         $uploadTasks = $course->getUploadTasks()->offsetGet(0);
@@ -99,6 +216,39 @@ class VCourses implements View {
                                 <td colspan="2"><button type="submit">Create</button>
                         </table>
                     </form>';
+        
+        $this->content = $return;
+    }
+    
+    public function setViewAllUploadTasksStudent (Courses $course) {
+        $return = '';
+        $return .= '
+            <script type="text/javascript" src="js/jquery.quick.search.js"></script>
+            <input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Tarea" />
+                <table class="lista-clientes" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Nombre
+                            <th>Fecha Data
+                            <th colspan="2" class="actions">
+                        </tr>
+                    </thead>
+        ';
+        
+        for ($i = 0 ; $i < $course->getUploadTasks()->count() ; $i++) {
+            $uploadTask = $course->getUploadTasks()->offsetGet($i);
+            if ($uploadTask instanceof UploadTasks) {
+                $return .= '
+                    <tr>
+                        <td>'.$uploadTask->getName().'
+                        <td>'.$uploadTask->getDateFinish()->format("d/m/Y H:i:s").'
+                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_UPLOAD_TASKS_STUDENT."&idUploadTasks=".$uploadTask->getIdUploadTasks()."'".')" src="imagens/enter.png">
+                    ';
+            }
+        }
+        
+        
+        $return .= '</table>';
         
         $this->content = $return;
     }
@@ -1535,7 +1685,7 @@ class VCourses implements View {
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_FILES_COURSE."&idCourse=".$course->getId()."'".')">Archivos</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_ALL_EXERCISES_STUDENTS."&idCourse=".$course->getId()."'".')">Ejercicios</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Tareas</a></li>
+                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_ALL_UPLOAD_TASKS_STUDENT."&idCourse=".$course->getId()."'".')">Tareas</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Notas</a></li>
                 <li class="elapseTime">Tiempo de carrera: '.$this->viewTimeElapse($course->getStudentsRegistered()->offsetGet(0)).'</li>
             </ul>

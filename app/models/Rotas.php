@@ -117,6 +117,7 @@ class Rotas {
 	public static $VIEW_INFO_TAREA_INSTRUCTOR = "viewInfoTareaInstructor";
 	public static $EDIT_TAREA_INSTRUCTOR = "editTareaInstructor";
 	public static $OPEN_TAREA_INSTRUCTOR = "openTareaInstructor";
+	public static $CHANGE_NOTA_UPLOAD_TASTKS = "changeNotaUploadTasks";
 	
 	//Códigos SubRotas Cursos
 	public static $COD_NEW_COURSE = 30;
@@ -150,6 +151,11 @@ class Rotas {
 	public static $CONFIRM_FINISH_EXERCISES = 'confirmFinishExercises';
 	public static $FINISH_EXERCISES = 'finishExercises';
 	public static $VIEW_DATA_EXERCISES = 'viewDataExercises';
+	public static $VIEW_ALL_UPLOAD_TASKS_STUDENT = 'viewAllUploadTasksStudent';
+	public static $OPEN_UPLOAD_TASKS_STUDENT = 'openUploadTasksStudent';
+	public static $VIEW_INFO_UPLOAD_TASKS_STUDENT = 'viewInfoUploadTasksStudent';
+	public static $UPLOAD_FILE_UPLOAD_TASKS = 'uploadFileUploadTasks';
+	public static $DOWNLOAD_FILE_UPLOAD_TASKS = 'downloadFileUploadTasks';
 	
 	
 	//SubRotas Cursos Instrutor

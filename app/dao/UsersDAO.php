@@ -20,6 +20,9 @@ class UsersDAO extends DAO{
     private $insertUser = "INSERT INTO Users (Email, Name, Password, DateBirth, City, Country, Type) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')";
     private $insertPermission = "INSERT INTO UsersPermission (IdPermission, EmailUsers) VALUES %s";
     private $insertComposition = "INSERT INTO UserComposition (EmailUser, IdQuestion, IdExercises, SequenceComposition) VALUES ('%s', '%s', '%s', '%s')";
+    private $insertUploadTasks = "INSERT INTO UploadTasksUser (IdUploadTasks, EmailUser, DateSend, File, NameFile) VALUES ('%s', '%s', '%s', '%s', '%s')";
+    private $updateUploadTasks = "UPDATE UploadTasksUser SET DateSend = '%s', File = '%s', NameFile = '%s' WHERE IdUploadTasks LIKE '%s' AND EmailUser LIKE '%s'";
+    private $updateUploadTasksPercentagem = "UPDATE UploadTasksUser SET Percentagem = '%s' WHERE IdUploadTasks LIKE '%s' AND EmailUser LIKE '%s'";
     private $select = "SELECT U.Id, U.Email, U.Name, U.Password, U.DateBirth, U.City, U.Country, U.Type, 
                         UC.IdClass, UP.IdPermission, P.IsMenu, P.Menu, P.Link,
                         TU.IdTasks, TU.Percentagem,
@@ -31,7 +34,8 @@ class UsersDAO extends DAO{
                         left join Permission as P ON P.id = UP.IdPermission WHERE %s %s";
     private $selecTasks = "SELECT U.Id, U.Email, U.Name, U.Password, U.DateBirth, U.City, U.Country, U.Type,
                         C.Id as IdCourse, C.Name as NameCourse, C.Description, C.DateNew, C.DateFinish, C.Information, C.Instructor,
-                        C.Password, C.CertifiedPercentage, C.MinimumTime,
+                        C.Password as PasswordCourse, C.CertifiedPercentage, C.MinimumTime,
+                        UTU.IdUploadTasks, UTU.DateSend as DateSendUploadTasks, UTU.File as FileUploadTasks, UTU.NameFile as NameFileUploadTasks, UTU.Percentagem as PercentagemUploadTasks,
                         T.Id as IdTasks, T.WeightTask, TU.Percentagem, TU.EmailUser,
                         EX.Id as IdExercises, EX.Name as NameExercises, Ex.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises
                         FROM Courses as C left join CoursesAvailableClass as CAC ON C.Id = CAC.IdCourse
@@ -39,6 +43,7 @@ class UsersDAO extends DAO{
                         left join TasksUsers as TU ON T.Id = TU.IdTasks
                         left join Exercises as EX ON T.Id = EX.IdTasks
                         left join Users as U ON U.Email = TU.EmailUser
+                        left join UploadTasksUser as UTU ON UTU.EmailUser = U.Email
                         WHERE %s %s";
     private $update = "UPDATE Users SET Name = '%s', Password = '%s', DateBirth = '%s', City = '%s', Country = '%s' WHERE Email = '%s'";
     private $updateCompostion = "UPDATE UserComposition SET SequenceComposition = '%s' WHERE EmailUser LIKE '%s' AND IdQuestion LIKE '%s' AND IdExercises LIKE '%s'";
@@ -80,6 +85,27 @@ class UsersDAO extends DAO{
             }
         }
         return false;
+    }
+    
+    public function insertUploadTasks (Users $user) {
+        $uploadTasks = $user->getUploadTasks()->offsetGet(0);
+        if ($uploadTasks instanceof UploadTasks) {
+            $sql = sprintf($this->insertUploadTasks, $uploadTasks->getIdUploadTasks(), $user->getEmail(), $uploadTasks->getDateSend()->format("Y-m-d H:i:s"), $uploadTasks->getFile()->getLocation(), $uploadTasks->getFile()->getName());
+            if (! $this->runQuery($sql)) {
+                $sql = sprintf($this->updateUploadTasks, $uploadTasks->getDateSend()->format("Y-m-d H:i:s"), $uploadTasks->getFile()->getLocation(), $uploadTasks->getFile()->getName(), $uploadTasks->getIdUploadTasks(), $user->getEmail());
+                return $this->runQuery($sql);
+            } else {
+                return true;
+            }
+        }
+    }
+    
+    public function updatePercentagemUpdateTasks (Users $user) {
+        $uploadTasks = $user->getUploadTasks()->offsetGet(0);
+        if ($uploadTasks instanceof UploadTasks) {
+            $sql = sprintf($this->updateUploadTasksPercentagem, $uploadTasks->getPercentagem(), $uploadTasks->getIdUploadTasks(), $user->getEmail());
+            return $this->runQuery($sql);
+        }
     }
     
     protected function multiplesInsertsPermission (ArrayObject $ojects, Users $user) {
@@ -174,6 +200,19 @@ class UsersDAO extends DAO{
         return $array;
     }
     
+    protected function insertUpload (ArrayObject $array, UploadTasks $uploadTasks) {
+        for ($i = 0 ; $i < $array->count() ; $i++) {
+            $newUploadTasks = $array->offsetGet($i);
+            if ($newUploadTasks instanceof UploadTasks) {
+                if ($newUploadTasks->getIdUploadTasks() == $uploadTasks->getIdUploadTasks()) {
+                    return $array;
+                }
+            }
+        }
+        $array->append($uploadTasks);
+        return $array;
+    }
+    
     protected function insertClasses (ArrayObject $array, Classes $class) {
         for ($i = 0 ; $i < $array->count() ; $i++) {
             $newClass = $array->offsetGet($i);
@@ -206,11 +245,20 @@ class UsersDAO extends DAO{
             $newUser = $array->offsetGet($i);
             if ($newUser instanceof Users) {
                 if ($newUser->getEmail() == $users->getEmail()) {
-                    $newUser->setPermissions($this->insertPermission($newUser->getPermissions(), $users->getPermissions()->offsetGet(0)));
-                    $newUser->setClasses($this->insertClasses($newUser->getClasses(), $users->getClasses()->offsetGet(0)));
+                    if ($users->getPermissions() != null && $users->getPermissions()->count() > 0) {
+                        $newUser->setPermissions($this->insertPermission($newUser->getPermissions(), $users->getPermissions()->offsetGet(0)));
+                    }
+                    
+                    if ($users->getClasses() != null && $users->getClasses()->count() > 0) {
+                        $newUser->setClasses($this->insertClasses($newUser->getClasses(), $users->getClasses()->offsetGet(0)));
+                    }
                     
                     if ($users->getExercises() != null && $users->getExercises()->count() > 0) {
                         $newUser->setExercises($this->insertExercises($newUser->getExercises(), $users->getExercises()->offsetGet(0)));
+                    }
+                    
+                    if ($users->getUploadTasks() != null && $users->getUploadTasks()->count() > 0) {
+                        $newUser->setUploadTasks($this->insertUpload($newUser->getUploadTasks(), $users->getUploadTasks()->offsetGet(0)));
                     }
                     
                     $array->offsetSet($i, $newUser);
@@ -273,6 +321,22 @@ class UsersDAO extends DAO{
                 }
                 $user->setExercises($exercises);
                 
+                $uploadTasks = new ArrayObject();
+                
+                if (isset($rs[$i]['IdUploadTasks']) && $rs[$i]['IdUploadTasks'] != null) {
+                    $uploadTask = new UploadTasks();
+                    $uploadTask->setDateSend(DateTime::createFromFormat("Y-m-d H:i:s", $rs[$i]['DateSendUploadTasks']));
+                    $file = new Files();
+                    $file->setLocation($rs[$i]['FileUploadTasks']);
+                    $file->setName($rs[$i]['NameFileUploadTasks']);
+                    $uploadTask->setFile($file);
+                    $uploadTask->setIdUploadTasks($rs[$i]['IdUploadTasks']);
+                    $uploadTask->setPercentagem($rs[$i]['PercentagemUploadTasks']);
+                    
+                    $uploadTasks->append($uploadTask);
+                }
+                
+                $user->setUploadTasks($uploadTasks);
                 
                 $user->setId($rs[$i]['Id']);
                 $user->setEmail($rs[$i]['Email']);

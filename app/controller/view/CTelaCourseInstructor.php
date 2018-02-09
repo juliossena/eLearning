@@ -647,7 +647,44 @@ class CTelaCourseInstructor extends CTela{
                 
                 break;
             case Rotas::$OPEN_TAREA_INSTRUCTOR:
+                $uploadTasks = new ArrayObject();
                 
+                $uploadTask = new UploadTasks();
+                $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                $uploadTasks->append($uploadTask);
+                
+                $user = new Users();
+                $user->setUploadTasks($uploadTasks);
+                
+                $userDAO = new UsersDAO();
+                
+                $filterUser = new FilterUsers($user);
+                $filterUser->setOrder("ORDER BY Name");
+                
+                $users = $userDAO->getUserTasks($filterUser);
+                
+                $this->screen->setOpenUploadTasksInstructor($users);
+                
+                break;
+            case Rotas::$CHANGE_NOTA_UPLOAD_TASTKS:
+                $emailUser = $_REQUEST['emailUser'];
+                $idUploadTasks = $_REQUEST['idUploadTasks'];
+                $percentagem = $_REQUEST['notaUploadTasks'] / 100;
+                
+                $user = new Users();
+                $user->setEmail($emailUser);
+                
+                $uploadTasks = new ArrayObject();
+                $uploadTask = new UploadTasks();
+                $uploadTask->setIdUploadTasks($idUploadTasks);
+                $uploadTask->setPercentagem($percentagem);
+                $uploadTasks->append($uploadTask);
+                
+                $user->setUploadTasks($uploadTasks);
+                
+                $userDAO = new UsersDAO();
+                
+                $userDAO->updatePercentagemUpdateTasks($user);
                 break;
             default:
                 break;
