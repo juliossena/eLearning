@@ -1905,3 +1905,38 @@ div.resultTask {
 }
 
 
+/*Início configuração Upload Tasks*/
+
+table.uploadTasks {
+	width: 100%;
+}
+
+table.uploadTasks tr {
+	border-top: 1px solid #e2e2e2;
+	border-bottom: 1px solid #e2e2e2;
+}
+
+table.uploadTasks td {
+	font-size: 9pt;
+	color: #004e6a;
+	padding: 10px;
+}
+
+label.btnFile {
+	color: #004e6a;
+	cursor: pointer;
+	transition: 0.5s;
+	margin: 20px;
+	padding: 10px;
+	width: 250px;
+	background-color: #e2e2e2;
+	border: 1px solid #cfcfcf;
+	border-radius: 5px;
+}
+
+label.btnFile:hover {
+	background-color: #cfcfcf;
+}
+
+
+/*Término configuração Upload Tasks*/
