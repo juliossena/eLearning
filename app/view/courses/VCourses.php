@@ -50,6 +50,95 @@ class VCourses implements View {
         $this->content = $return;
     }
     
+    public function setViewAllGradesIntructor (ArrayObject $users) {
+        $return = '';
+        $return .= '<input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Nota" />
+                    <table class="lista-clientes" style="width:100%;">
+                         <thead>
+                            <tr>
+                                <th>Nombre
+                                <th>Valor
+                                <th>Nota
+                         </thead>';
+        
+        for ($k = 0 ; $k < $users->count() ; $k++) {
+            $user = $users->offsetGet($k);
+            if ($user instanceof Users) {
+                $total = 0;
+                $grade = 0;
+                for ($i = 0 ; $i < $user->getExercises()->count() ; $i++) {
+                    $exercise = $user->getExercises()->offsetGet($i);
+                    if ($exercise instanceof Exercises) {
+                        $total += $exercise->getWeightTask();
+                        $grade += $exercise->getPointes();
+                    }
+                }
+                for ($i = 0 ; $i < $user->getUploadTasks()->count() ; $i++) {
+                    $uploadTasks = $user->getUploadTasks()->offsetGet($i);
+                    if ($uploadTasks instanceof UploadTasks){
+                        $total += $uploadTasks->getWeightTask();
+                        $grade += $uploadTasks->getPointes();
+                    }
+                }
+                $return .= '
+                    <tr>
+                        <td>' . $user->getName() . '
+                        <td>'.$total.'
+                        <td>'.$grade.'
+                ';
+            }
+        }
+        
+        
+        $return .= '
+                </table>';
+        $this->content = $return;
+    }
+    
+    public function setViewAllGradesStudent (Users $user) {
+        $return = '';
+        $return .= '<input type="text" class="input-search" alt="lista-clientes" placeholder="Buscar Nota" />
+                    <table class="lista-clientes" style="width:100%;">
+                         <thead>
+                            <tr>
+                                <th>Nombre
+                                <th>Valor
+                                <th>Nota
+                         </thead>';
+        $total = 0;
+        $grade = 0;
+        for ($i = 0 ; $i < $user->getExercises()->count() ; $i++) {
+            $exercise = $user->getExercises()->offsetGet($i);
+            if ($exercise instanceof Exercises) {
+                $total += $exercise->getWeightTask();
+                $grade += $exercise->getPointes();
+                $return .= '<tr>
+                                <td>'.$exercise->getName().'
+                                <td>'.$exercise->getWeightTask().'
+                                <td>'.$exercise->getPointes();
+            }
+        }
+        for ($i = 0 ; $i < $user->getUploadTasks()->count() ; $i++) {
+            $uploadTasks = $user->getUploadTasks()->offsetGet($i);
+            if ($uploadTasks instanceof UploadTasks){
+                $total += $uploadTasks->getWeightTask();
+                $grade += $uploadTasks->getPointes();
+                $return .= '<tr>
+                                <td>'.$uploadTasks->getName().'
+                                <td>'.$uploadTasks->getWeightTask().'
+                                <td>'.$uploadTasks->getPointes();
+            }
+        }
+        
+        $return .= '
+                    <tr>
+                        <td>
+                        <th style="text-align:center;">'.$total.'
+                        <th style="text-align:center;">'.$grade.'
+                </table>';
+        $this->content = $return;
+    }
+    
     public function setViewInfoTasksUpload (ArrayObject $users) {
         $return = '';
         $return .= '<h1 class="line">Resultados</h1>
@@ -317,12 +406,10 @@ class VCourses implements View {
                         <td>'.$uploadTask->getName().'
                         <td>'.$uploadTask->getDateFinish()->format("d/m/Y H:i:s").'
                         <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_EDIT_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."')".'" src="imagens/editar.png">
-                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_INFO_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."')".'" src="imagens/view.png">
-                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."'".')" src="imagens/enter.png">
+                        <td><img class="imgButton" onclick="'."carregarPaginaAtivarCheck('#dadosNovaPagina', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_INFO_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."&idTasks=".$uploadTask->getIdTask()."')".'" src="imagens/view.png">
+                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$OPEN_TAREA_INSTRUCTOR."&idUploadTasks=".$uploadTask->getIdUploadTasks()."&idTasks=".$uploadTask->getIdTask()."'".')" src="imagens/enter.png">
                     
                 ';
-                    
-                    
             }
         }
         
@@ -1698,7 +1785,7 @@ class VCourses implements View {
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_ALL_EXERCISES."&idCourse=".$course->getId()."'".')">Ejercicios</a></li>
                             <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_ALL_TAREAS."&idCourse=".$course->getId()."'".')">Tareas</a></li>
-                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Resultados</a></li>
+                            <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_INSTRUCTOR."&subSite=".Rotas::$VIEW_GRADES_INSTRUCTOR."&idCourse=".$course->getId()."'".')">Resultados</a></li>
                         </ul>
                     </div>
                                 
@@ -1726,7 +1813,7 @@ class VCourses implements View {
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_FORUNS_COURSE."&idCourse=".$course->getId()."'".')">Foros</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_ALL_EXERCISES_STUDENTS."&idCourse=".$course->getId()."'".')">Ejercicios</a></li>
                 <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_ALL_UPLOAD_TASKS_STUDENT."&idCourse=".$course->getId()."'".')">Tareas</a></li>
-                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_LIVE_CLASSES_COURSE."&idCourse=".$course->getId()."'".')">Notas</a></li>
+                <li><a href="#" onclick="carregarPagina('."'#dataTab', '?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$VIEW_GRADES_STUDENT."&idCourse=".$course->getId()."'".')">Notas</a></li>
                 <li class="elapseTime">Tiempo de carrera: '.$this->viewTimeElapse($course->getStudentsRegistered()->offsetGet(0)).'</li>
             </ul>
         </div>

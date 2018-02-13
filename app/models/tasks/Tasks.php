@@ -4,6 +4,7 @@ class Tasks {
     private $idTask;
     private $weightTask;
     private $percentagem;
+    private $pointes;
     
     public function getIdTask() {
         return $this->idTask;
@@ -19,6 +20,10 @@ class Tasks {
     
     public function setWeightTask($weightTask) {
         $this->weightTask = $weightTask;
+        
+        if ($this->percentagem != null) {
+            $this->pointes = $this->percentagem * $this->weightTask;
+        }
     }
     
     public function getPercentagem() {
@@ -27,6 +32,18 @@ class Tasks {
     
     public function setPercentagem($percentagem) {
         $this->percentagem = $percentagem;
+        
+        if ($this->weightTask != null) {
+            $this->pointes = $this->percentagem * $this->weightTask;
+        }
+    }
+    
+    public function getPointes() {
+        return $this->pointes;
+    }
+    
+    public function setPointes($pointes) {
+        $this->pointes = $pointes;
     }
     
     

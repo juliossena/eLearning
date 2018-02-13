@@ -21,6 +21,7 @@ class UsersDAO extends DAO{
     private $insertPermission = "INSERT INTO UsersPermission (IdPermission, EmailUsers) VALUES %s";
     private $insertComposition = "INSERT INTO UserComposition (EmailUser, IdQuestion, IdExercises, SequenceComposition) VALUES ('%s', '%s', '%s', '%s')";
     private $insertUploadTasks = "INSERT INTO UploadTasksUser (IdUploadTasks, EmailUser, DateSend, File, NameFile) VALUES ('%s', '%s', '%s', '%s', '%s')";
+    private $insertTasksUser = "INSERT INTO TasksUsers (IdTasks, EmailUser) VALUES ('%s', '%s')";
     private $updateUploadTasks = "UPDATE UploadTasksUser SET DateSend = '%s', File = '%s', NameFile = '%s' WHERE IdUploadTasks LIKE '%s' AND EmailUser LIKE '%s'";
     private $select = "SELECT U.Id, U.Email, U.Name, U.Password, U.DateBirth, U.City, U.Country, U.Type, 
                         UC.IdClass, UP.IdPermission, P.IsMenu, P.Menu, P.Link,
@@ -55,6 +56,28 @@ class UsersDAO extends DAO{
                         left join UploadTasksUser as UTU ON UTU.IdUploadTasks = UT.Id
                         left join TasksUsers as TU ON TU.IdTasks = T.Id
                         left join Users as U ON U.Email = UTU.EmailUser                        
+                        WHERE %s %s";
+    private $selectUploadTasksUser = "SELECT U.Id, U.Email, U.Name, U.Password, U.DateBirth, U.City, U.Country, U.Type,
+                        C.Id as IdCourse, C.Name as NameCourse, C.Description, C.DateNew, C.DateFinish, C.Information, C.Instructor,
+                        C.Password as PasswordCourse, C.CertifiedPercentage, C.MinimumTime,
+                        UTU.IdUploadTasks, UTU.DateSend as DateSendUploadTasks, UTU.File as FileUploadTasks, UTU.NameFile as NameFileUploadTasks,
+                        T.Id as IdTasks, T.WeightTask, TU.Percentagem
+                        FROM TasksUsers as TU
+                        INNER JOIN UploadTasksUser as UTU ON TU.EmailUser = UTU.EmailUser
+                        INNER JOIN UploadTasks as UT ON UT.Id = UTU.IdUploadTasks
+                        INNER JOIN Tasks as T ON T.Id = UT.IdTasks
+                        INNER JOIN Courses as C ON C.Id = T.IdCourses
+                        INNER JOIN Users as U ON U.Email = UTU.EmailUser 
+                        WHERE %s %s";
+    private $selectPointes = "SELECT U.Id, U.Email, U.Name, U.Password, U.DateBirth, U.City, U.Country, U.Type,
+                        T.Id as IdTasks, T.WeightTask, TU.Percentagem, TU.EmailUser,
+                        UT.Id as IdUploadTasks, UT.Name as NameUploadTasks, UT.DateFinish as DateFinishUploadTasks, UT.DaysDelay as DaysDelayUploadTasks,
+                        EX.Id as IdExercises, EX.Name as NameExercises, EX.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises
+                        FROM Tasks as T
+                    	LEFT JOIN TasksUsers as TU ON TU.IdTasks = T.Id
+                        LEFT JOIN Exercises as EX ON EX.IdTasks = T.Id
+                        Left Join UploadTasks as UT ON UT.IdTasks = T.Id
+                        LEFT JOIN Users as U ON TU.EmailUser = U.Email
                         WHERE %s %s";
     private $update = "UPDATE Users SET Name = '%s', Password = '%s', DateBirth = '%s', City = '%s', Country = '%s' WHERE Email = '%s'";
     private $updateCompostion = "UPDATE UserComposition SET SequenceComposition = '%s' WHERE EmailUser LIKE '%s' AND IdQuestion LIKE '%s' AND IdExercises LIKE '%s'";
@@ -106,7 +129,8 @@ class UsersDAO extends DAO{
                 $sql = sprintf($this->updateUploadTasks, $uploadTasks->getDateSend()->format("Y-m-d H:i:s"), $uploadTasks->getFile()->getLocation(), $uploadTasks->getFile()->getName(), $uploadTasks->getIdUploadTasks(), $user->getEmail());
                 return $this->runQuery($sql);
             } else {
-                return true;
+                $sql = sprintf($this->insertTasksUser, $uploadTasks->getIdTask(), $user->getEmail());
+                return $this->runQuery($sql);
             }
         }
     }
@@ -365,9 +389,92 @@ class UsersDAO extends DAO{
         return $objects;
     }
     
+    public function getUserUploadTasksPointes(FilterUsers $filter) {
+        $objects = new ArrayObject();
+        $sql = sprintf($this->selectPointes, $filter->getWhere(), $filter->getOrder());
+        $rs = $this->runSelect($sql);
+        
+        for ($i = 0 ; $i < count($rs) ; $i++){
+            for ($i = 0 ; $i < count($rs) ; $i++){
+                $user = new Users();
+                
+                
+                $exercises = new ArrayObject();
+                
+                $classes = new ArrayObject();
+                if (isset($rs[$i]['IdClass']) && $rs[$i]['IdClass'] != null) {
+                    $classe = new Classes();
+                    $classe->setId($rs[$i]['IdClass']);
+                    
+                    $classes->append($classe);
+                }
+                
+                $user->setClasses($classes);
+                
+                
+                $permissions = new ArrayObject();
+                if (isset($rs[$i]['IdPermission'] ) && $rs[$i]['IdPermission'] != null) {
+                    $permission = new Permission();
+                    $permission->setId($rs[$i]['IdPermission']);
+                    $permission->setIsMenu($rs[$i]['IsMenu']);
+                    $permission->setMenu($rs[$i]['Menu']);
+                    $permission->setLink($rs[$i]['Link']);
+                    
+                    $permissions->append($permission);
+                }
+                
+                $user->setPermissions($permissions);
+                
+                if (isset($rs[$i]['IdExercises']) && $rs[$i]['IdExercises'] != null) {
+                    $exercise = new Exercises();
+                    $exercise->setName($rs[$i]['NameExercises']);
+                    $exercise->setIdExercise($rs[$i]['IdExercises']);
+                    if ($rs[$i]['IdTasks'] != null) {
+                        $exercise->setIdTask($rs[$i]['IdTasks']);
+                        $exercise->setPercentagem($rs[$i]['Percentagem']);
+                        $exercise->setWeightTask($rs[$i]['WeightTask']);
+                    }
+                    
+                    $questions = new ArrayObject();
+                    $exercise->setQuestions($questions);
+                    
+                    $exercises->append($exercise);
+                }
+                $user->setExercises($exercises);
+                
+                $uploadTasks = new ArrayObject();
+                
+                if (isset($rs[$i]['IdUploadTasks']) && $rs[$i]['IdUploadTasks'] != null) {
+                    $uploadTask = new UploadTasks();
+                    $uploadTask->setIdTask($rs[$i]['IdTasks']);
+                    $uploadTask->setName($rs[$i]['NameUploadTasks']);
+                    $uploadTask->setIdUploadTasks($rs[$i]['IdUploadTasks']);
+                    $uploadTask->setPercentagem($rs[$i]['Percentagem']);
+                    $uploadTask->setWeightTask($rs[$i]['WeightTask']);
+                    
+                    $uploadTasks->append($uploadTask);
+                }
+                
+                $user->setUploadTasks($uploadTasks);
+                
+                $user->setId($rs[$i]['Id']);
+                $user->setEmail($rs[$i]['Email']);
+                $user->setName($rs[$i]['Name']);
+                $user->setPassword($rs[$i]['Password']);
+                $user->setDateBirth(new DateTime($rs[$i]['DateBirth']));
+                $user->setCity($rs[$i]['City']);
+                $user->setCountry($rs[$i]['Country']);
+                $user->setType($rs[$i]['Type']);
+                
+                $objects = $this->InsertObject($objects, $user);
+            }
+        }
+        return $objects;
+    }
+    
     public function getUserUploadTasks(FilterUsers $filter) {
         $objects = new ArrayObject();
-        $sql = sprintf($this->selecUploadTasks, $filter->getWhere(), $filter->getOrder());
+        $sql = sprintf($this->selectUploadTasksUser, $filter->getWhere(), $filter->getOrder());
         $rs = $this->runSelect($sql);
         
         for ($i = 0 ; $i < count($rs) ; $i++){

@@ -734,6 +734,27 @@ class CTelaCourseStudent extends CTela{
                 }
                 
                 break;
+            case Rotas::$VIEW_GRADES_STUDENT:
+                $idCourse = $_REQUEST['idCourse'];
+                
+                $course = new Courses();
+                $course->setId($idCourse);
+                
+                $courses = new ArrayObject();
+                $courses->append($course);
+                $this->user->setCourses($courses);
+                
+                $filterUser = new FilterUsers($this->user);
+                
+                $userDAO = new UsersDAO();
+                
+                $user = $userDAO->getUserUploadTasksPointes($filterUser)->offsetGet(0);
+                
+                if ($user instanceof Users) {
+                    $this->screen->setViewAllGradesStudent($user);
+                }
+                
+                break;
             default:
                 break;
         }

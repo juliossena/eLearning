@@ -31,12 +31,34 @@ class FilterUsers extends FilterSearch {
         
         if ($this->users != null) {
             if ($this->users instanceof Users) {
-                if ($this->users->getEmail() == null && $this->users->getUploadTasks() != null && $this->users->getUploadTasks()->count() > 0) {
+                if ($this->users->getEmail() == null && $this->users->getCourses() != null && $this->users->getCourses()->count() > 0) {
+                    $course = $this->users->getCourses()->offsetGet(0);
+                    if ($course instanceof Courses) {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "T.IdCourses LIKE '%s'",
+                            $course->getId());
+                    }
+                }else if ($this->users->getEmail() != null && $this->users->getCourses() != null && $this->users->getCourses()->count() > 0) {
+                    $course = $this->users->getCourses()->offsetGet(0);
+                    if ($course instanceof Courses) {
+                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                            "T.IdCourses LIKE '%s' AND U.Email LIKE '%s'",
+                            $course->getId(),
+                            $this->users->getEmail());
+                    }
+                } else if ($this->users->getEmail() == null && $this->users->getUploadTasks() != null && $this->users->getUploadTasks()->count() > 0) {
                     $uploadTasks = $this->users->getUploadTasks()->offsetGet(0);
                     if ($uploadTasks instanceof UploadTasks) {
-                        $pesquisa = $this->getCampo($pesquisa) . sprintf(
-                            "UTU.IdUploadTasks LIKE '%s'",
-                            $uploadTasks->getIdUploadTasks());
+                        if ($uploadTasks->getIdTask() == null) {
+                            $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                                "UTU.IdUploadTasks LIKE '%s'",
+                                $uploadTasks->getIdUploadTasks());
+                        } else {
+                            $pesquisa = $this->getCampo($pesquisa) . sprintf(
+                                "UTU.IdUploadTasks LIKE '%s' AND TU.IdTasks LIKE '%s'",
+                                $uploadTasks->getIdUploadTasks(),
+                                $uploadTasks->getIdTask());
+                        }
                     }
                 }else if ($this->users->getEmail() != null && $this->users->getUploadTasks() != null && $this->users->getUploadTasks()->count() > 0) {
                     $uploadTasks = $this->users->getUploadTasks()->offsetGet(0);

@@ -647,6 +647,7 @@ class CTelaCourseInstructor extends CTela{
                 $uploadTasks = new ArrayObject();
                 
                 $uploadTask = new UploadTasks();
+                $uploadTask->setIdTask($_REQUEST['idTasks']);
                 $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
                 $uploadTasks->append($uploadTask);
                 
@@ -667,6 +668,7 @@ class CTelaCourseInstructor extends CTela{
                 $uploadTasks = new ArrayObject();
                 
                 $uploadTask = new UploadTasks();
+                $uploadTask->setIdTask($_REQUEST['idTasks']);
                 $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
                 $uploadTasks->append($uploadTask);
                 
@@ -704,6 +706,27 @@ class CTelaCourseInstructor extends CTela{
                 $courseDAO = new CoursesDAO();
                 
                 $courseDAO->insertTasksUploadUser($user);
+                
+                break;
+            case Rotas::$VIEW_GRADES_INSTRUCTOR:
+                $idCourse = $_REQUEST['idCourse'];
+                
+                $course = new Courses();
+                $course->setId($idCourse);
+                
+                $courses = new ArrayObject();
+                $courses->append($course);
+                
+                $user = new Users();
+                $user->setCourses($courses);
+                
+                $filterUser = new FilterUsers($user);
+                
+                $userDAO = new UsersDAO();
+                
+                $users = $userDAO->getUserUploadTasksPointes($filterUser);
+                
+                $this->screen->setViewAllGradesIntructor($users);
                 
                 break;
             default:
