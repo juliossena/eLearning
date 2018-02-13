@@ -43,6 +43,43 @@ class VCourses implements View {
         $this->content = $this->newQuestion();
     }
     
+    public function setViewResultsCourse () {
+        $return = '';
+        
+        
+        $this->content = $return;
+    }
+    
+    public function setViewInfoTasksUpload (ArrayObject $users) {
+        $return = '';
+        $return .= '<h1 class="line">Resultados</h1>
+                    <table class="lista-clientes"  width="100%">
+                <thead>
+                    <tr>
+                        <th>Nombre
+                        <th>Nota
+                </thead>
+        ';
+        
+        for ($i = 0 ; $i < $users->count() ; $i++) {
+            $user = $users->offsetGet($i);
+            if ($user instanceof Users) {
+                $uploadTasks = $user->getUploadTasks()->offsetGet(0);
+                if ($uploadTasks instanceof UploadTasks) {
+                    $return .= '<tr>
+                                    <td>'.$user->getName().'
+                                    <td>'. number_format(($uploadTasks->getPercentagem() * 100), 2, ',', ' ') .'%
+                    ';
+                }
+            }
+            
+        }
+        
+        $return .= '</table>';
+        
+        $this->content = $return;
+    }
+    
     public function setOpenUploadTasksInstructor (ArrayObject $arrayUsers) {
         $return = '';
         $return .= '<script type="text/javascript" src="js/script.js"></script>
@@ -68,6 +105,7 @@ class VCourses implements View {
                                         </div>
                                     <td>' . $uploadTasks->getDateSend()->format("d/m/Y H:i:s") . '
                                     <td><form id="changeNotaUploadTasks">
+                                            <input type="hidden" name="idTasks" value="' . $uploadTasks->getIdTask() . '">
                                             <input type="hidden" name="idUploadTasks" value="' . $uploadTasks->getIdUploadTasks() . '">
                                             <input type="hidden" name="emailUser" value="' . $user->getEmail() . '">
                                             <input type="hidden" name="rota" value="?site=' . Rotas::$COURSES_INSTRUCTOR . '&subSite=' . Rotas::$CHANGE_NOTA_UPLOAD_TASTKS . '">
@@ -128,6 +166,8 @@ class VCourses implements View {
                 <input type="hidden" name="rota" value="?site='.Rotas::$COURSES_STUDENTS.'&subSite='.Rotas::$UPLOAD_FILE_UPLOAD_TASKS.'">
                 <input name="fileUploadTasks" type="file" id="fileUploadTasks">
                 <input name="idUploadTasks" type="hidden" value="' . $uploadTasks->getIdUploadTasks() . '">
+                <input name="idTasks" type="hidden" value="' . $uploadTasks->getIdTask() . '">
+
                 <input type="hidden" name="rotaActual" value="?site='.Rotas::$COURSES_STUDENTS.'&subSite='.Rotas::$OPEN_UPLOAD_TASKS_STUDENT.'&idUploadTasks='.$uploadTasks->getIdUploadTasks().'">
             </form>
             <table class="uploadTasks">
@@ -242,7 +282,7 @@ class VCourses implements View {
                     <tr>
                         <td>'.$uploadTask->getName().'
                         <td>'.$uploadTask->getDateFinish()->format("d/m/Y H:i:s").'
-                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_UPLOAD_TASKS_STUDENT."&idUploadTasks=".$uploadTask->getIdUploadTasks()."'".')" src="imagens/enter.png">
+                        <td><img class="imgButton" onclick="carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_UPLOAD_TASKS_STUDENT."&idUploadTasks=".$uploadTask->getIdUploadTasks()."&idTasks=".$uploadTask->getIdTask()."'".')" src="imagens/enter.png">
                     ';
             }
         }

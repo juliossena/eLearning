@@ -644,6 +644,23 @@ class CTelaCourseInstructor extends CTela{
                 }
                 break;
             case Rotas::$VIEW_INFO_TAREA_INSTRUCTOR:
+                $uploadTasks = new ArrayObject();
+                
+                $uploadTask = new UploadTasks();
+                $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                $uploadTasks->append($uploadTask);
+                
+                $user = new Users();
+                $user->setUploadTasks($uploadTasks);
+                
+                $userDAO = new UsersDAO();
+                
+                $filterUser = new FilterUsers($user);
+                $filterUser->setOrder("ORDER BY Name");
+                
+                $users = $userDAO->getUserUploadTasks($filterUser);
+                
+                $this->screen->setViewInfoTasksUpload($users);
                 
                 break;
             case Rotas::$OPEN_TAREA_INSTRUCTOR:
@@ -661,13 +678,14 @@ class CTelaCourseInstructor extends CTela{
                 $filterUser = new FilterUsers($user);
                 $filterUser->setOrder("ORDER BY Name");
                 
-                $users = $userDAO->getUserTasks($filterUser);
+                $users = $userDAO->getUserUploadTasks($filterUser);
                 
                 $this->screen->setOpenUploadTasksInstructor($users);
                 
                 break;
             case Rotas::$CHANGE_NOTA_UPLOAD_TASTKS:
                 $emailUser = $_REQUEST['emailUser'];
+                $idTasks = $_REQUEST['idTasks'];
                 $idUploadTasks = $_REQUEST['idUploadTasks'];
                 $percentagem = $_REQUEST['notaUploadTasks'] / 100;
                 
@@ -676,15 +694,17 @@ class CTelaCourseInstructor extends CTela{
                 
                 $uploadTasks = new ArrayObject();
                 $uploadTask = new UploadTasks();
+                $uploadTask->setIdTask($idTasks);
                 $uploadTask->setIdUploadTasks($idUploadTasks);
                 $uploadTask->setPercentagem($percentagem);
                 $uploadTasks->append($uploadTask);
                 
                 $user->setUploadTasks($uploadTasks);
                 
-                $userDAO = new UsersDAO();
+                $courseDAO = new CoursesDAO();
                 
-                $userDAO->updatePercentagemUpdateTasks($user);
+                $courseDAO->insertTasksUploadUser($user);
+                
                 break;
             default:
                 break;

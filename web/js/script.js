@@ -78,6 +78,46 @@ function setNumberQuestions($number) {
 
 
 $(function(){
+	$('form#changeNotaUploadTasks').submit(function(){
+		$.ajax({
+			type: 'POST',
+			contentType: false,
+    	    cache: false,
+			processData:false,
+			url: $('input[name=rota]').val(),
+			data:  new FormData(this), 
+		}).done(function(e){
+		});
+		return false;
+	});
+	
+	$('form#changeNotaUploadTasks').change(function(){
+		$.ajax({
+			type: 'POST',
+			contentType: false,
+    	    cache: false,
+			processData:false,
+			url: $('input[name=rota]').val(),
+			data:  new FormData(this), 
+		}).done(function(e){
+		});
+		return false;
+	});
+	
+	$('form#sendUploadTask').change(function(){
+		$("#result").html('<img src="imagens/carregando.gif">');
+		$.ajax({
+			type: 'POST',
+			contentType: false,
+    	    cache: false,
+			processData:false,
+			url: $('input[name=rota]').val(),
+			data:  new FormData(this), 
+		}).done(function(e){
+			$("#result").html(e);
+		});
+		return false;
+	});
 	
 	$('form#enviarC').change(function(){
 		$.ajax({

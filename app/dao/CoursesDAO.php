@@ -21,6 +21,7 @@ class CoursesDAO extends DAO{
     private $nextAutoIncrementTasks = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Tasks'";
     private $nextAutoIncrementQuestion = "SELECT AUTO_INCREMENT FROM information_schema.tables WHERE table_name = 'Question'";
     private $insertTasksUser = "INSERT INTO TasksUsers (IdTasks, EmailUser, Percentagem) VALUES ('%s', '%s', '%s')";
+    private $uploadTasksUser = "UPDATE TasksUsers SET Percentagem = '%s' WHERE IdTasks LIKE '%s' AND EmailUser LIKE '%s'";
     private $insertCourse = "INSERT INTO Courses (Id, Name, Description, DateNew, DateFinish, Information, Instructor, Password, CertifiedPercentage, MinimumTime) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
     private $insertCourseClass = "INSERT INTO CoursesAvailableClass (IdCourse, IdClass) VALUES %s";
     private $insertCourseUser = "INSERT INTO CoursesAvailableUser (IdCourse, EmailUser) VALUES %s";
@@ -179,6 +180,25 @@ class CoursesDAO extends DAO{
         $exercise = $user->getExercises()->offsetGet(0);
         if ($exercise instanceof Exercises) {
             $sql = sprintf($this->insertTasksUser, $exercise->getIdTask(), $user->getEmail(), $exercise->getPercentagem());
+            return $this->runQuery($sql);
+        }
+    }
+    
+    public function insertTasksUploadUser (Users $user) {
+        $uploadTasks = $user->getUploadTasks()->offsetGet(0);
+        if ($uploadTasks instanceof UploadTasks) {
+            $sql = sprintf($this->insertTasksUser, $uploadTasks->getIdTask(), $user->getEmail(), $uploadTasks->getPercentagem());
+            if (! $this->runQuery($sql)) {
+                $sql = sprintf($this->uploadTasksUser, $uploadTasks->getPercentagem(), $uploadTasks->getIdTask(),$user->getEmail());
+                return $this->runQuery($sql);
+            }
+        }
+    }
+    
+    public function uploadTasksUser (Users $user) {
+        $exercise = $user->getExercises()->offsetGet(0);
+        if ($exercise instanceof Exercises) {
+            $sql = sprintf($this->uploadTasksUser, $exercise->getPercentagem(), $exercise->getIdTask(),$user->getEmail());
             return $this->runQuery($sql);
         }
     }

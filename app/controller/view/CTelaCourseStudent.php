@@ -613,6 +613,7 @@ class CTelaCourseStudent extends CTela{
                 $uploadTasks = new ArrayObject();
                 
                 $uploadTask = new UploadTasks();
+                $uploadTask->setIdTask($_REQUEST['idTasks']);
                 $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
                 $uploadTasks->append($uploadTask);
                 
@@ -622,7 +623,12 @@ class CTelaCourseStudent extends CTela{
                 
                 $courseDAO = new CoursesDAO();
                 
-                $course = $courseDAO->getObjects($filterCourse)->offsetGet(0);
+                $courses = $courseDAO->getObjects($filterCourse);
+                if ($courses->count() > 0) {
+                    $course = $courses->offsetGet(0);
+                } else {
+                    $course = new Courses();
+                }
                 
                 $this->user->setUploadTasks($uploadTasks);
                 
@@ -630,7 +636,19 @@ class CTelaCourseStudent extends CTela{
                 
                 $userDAO = new UsersDAO();
                 
-                $userUploadTasks = $userDAO->getUserTasks($filterUser);
+                $userUploadTasks = $userDAO->getUserUploadTasks($filterUser);
+                if ($userUploadTasks->count() == 0) {
+                    $uploadTasks = new ArrayObject();
+                    $uploadTask = new UploadTasks();
+                    $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                    $uploadTasks->append($uploadTask);
+                    
+                    $this->user->setUploadTasks($uploadTasks);
+                    
+                    $filterUser = new FilterUsers($this->user);
+                    $userUploadTasks = $userDAO->getUserUploadTasks($filterUser);
+                    
+                }
                 
                 if ($userUploadTasks->count() > 0) {
                     $userUploadTasks = $userUploadTasks->offsetGet(0);
@@ -639,7 +657,10 @@ class CTelaCourseStudent extends CTela{
                 
                 
                 if ($course instanceof Courses) {
-                    $uploadTask = $course->getUploadTasks()->offsetGet(0);
+                    if ($course->getUploadTasks() != null && $course->getUploadTasks()->count() > 0) {
+                        $uploadTask = $course->getUploadTasks()->offsetGet(0);
+                    }
+                    
                     if ($uploadTask instanceof UploadTasks && $userUploadTasks instanceof UploadTasks) {
                         $uploadTask->setDateSend($userUploadTasks->getDateSend());
                         $uploadTask->setFile($userUploadTasks->getFile());
@@ -672,6 +693,7 @@ class CTelaCourseStudent extends CTela{
                     
                     $uploadTask = new UploadTasks();
                     $uploadTask->setIdUploadTasks($_REQUEST['idUploadTasks']);
+                    $uploadTask->setIdTask($_REQUEST['idTasks']);
                     $uploadTask->setDateSend(DateTime::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:s")));
                     $uploadTask->setFile($files);
                     
@@ -684,7 +706,7 @@ class CTelaCourseStudent extends CTela{
                     if ($userDAO->insertUploadTasks($this->user)) {
                         echo '
                             <script>
-                                carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_UPLOAD_TASKS_STUDENT."&idUploadTasks=".$_REQUEST['rotaActual']."'".')
+                                carregarPagina('."'#dataTab', 'index.php?site=".Rotas::$COURSES_STUDENTS."&subSite=".Rotas::$OPEN_UPLOAD_TASKS_STUDENT."&idUploadTasks=".$_REQUEST['rotaActual']."&idTasks=".$uploadTask->getIdTask()."'".')
                             </script>
                         ';
                     }

@@ -43,8 +43,8 @@ class FilterCourses extends FilterSearch {
                 $uploadTasks = $this->courses->getUploadTasks()->offsetGet(0);
                 if ($uploadTasks instanceof UploadTasks) {
                     $pesquisa = $this->getCampo($pesquisa) . sprintf(
-                        "UT.Id LIKE '%s'",
-                        $uploadTasks->getIdUploadTasks());
+                        "UT.IdTasks LIKE '%s'",
+                        $uploadTasks->getIdTask());
                 }
             } else if ($this->courses->getExercises() != null && $this->courses->getExercises()->count() > 0) {
                 $exercise = $this->courses->getExercises()->offsetGet(0);
