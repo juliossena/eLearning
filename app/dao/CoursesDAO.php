@@ -65,7 +65,7 @@ class CoursesDAO extends DAO{
                         T.Id as IdTasks, T.WeightTask, TU.Percentagem,
                         UT.Id as IdUploadTask, UT.Name as NameUploadTask, UT.DateFinish as DateFinishUploadTask, UT.DaysDelay as DaysDelayUploadTask,
                         FI.Id as IdFile, FI.Name as NameFile, FI.Thumbnail, FI.Link as LinkFile,
-                        EX.Id as IdExercises, EX.Name as NameExercises, Ex.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises,
+                        EX.Id as IdExercises, EX.Name as NameExercises, EX.DateLimite as DateLimiteExercises, EX.Released as ReleasedExercises,
                         QU.Id as IdQuestion, QU.Difficulty as DifficultyQuestion, QU.Sequence as SequenceQuestion, 
                         CQ.Sequence as SequenceComposition, CQ.Type as TypeCompostion, CQ.Text as TextComposition, CQ.Link as LinkComposition, CQ.Answer as AnswerQuestion,
                         NC.Id as IdNewsCourse, NC.Type as TypeNewsCourse, NC.ChangeCourse, NC.TimeChange, NC.EmailUser as EmailUserNews, 

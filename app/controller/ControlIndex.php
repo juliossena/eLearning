@@ -93,7 +93,7 @@ class ControlIndex {
 			        break;
 				case Rotas::$LOGOFF:
 				    session_destroy();
-				    header("Location: index.php");
+				    header("Location: ?");
 				    break;
 				default:
 				    $controle = new CTelaHome($user);

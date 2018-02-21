@@ -1,17 +1,18 @@
 <?php
 
 class Connection {
+    /*
     private $usuario = "root";
 	private $senha = "";
 	private $host = "localhost";
 	private $db = "site";
-	
-	/*
-	private $usuario = "tinnitusperu";
-    private $senha = "S1stem@M";
-    private $host = "198.57.158.150";
-    private $db = "tinnitus_eLearning";
 	*/
+	
+	private $usuario = "indutel";
+    private $senha = "~Y?(NjET9B@=";
+    private $host = "198.57.158.150";
+    private $db = "indutel_registro";
+	
 
 	private function connect(){
 		$conn = new PDO("mysql:host=$this->host;dbname=$this->db", $this->usuario, $this->senha);

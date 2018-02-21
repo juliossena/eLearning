@@ -215,7 +215,6 @@ class CTelaCourseStudent extends CTela{
                 $course = $courseDAO->getFiles($filter)->offsetGet(0);
                 
                 if ($course instanceof Courses) {
-                    if ($this->permissionOpenCourse($this->user, $course)) {
                         for ($i = 0 ; $i < $course->getFiles()->count() ; $i++) {
                             $file = $course->getFiles()->offsetGet($i);
                             if ($file instanceof Files) {
@@ -224,7 +223,6 @@ class CTelaCourseStudent extends CTela{
                                 }
                             }
                         }
-                    }
                 }
                 break;
             case Rotas::$VIEW_FORUNS_COURSE:
